@@ -12,14 +12,14 @@ export default function CarrinhoPage() {
   if (items.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <ShoppingBag className="mx-auto mb-4 text-gray-300" size={64} />
-        <h1 className="text-2xl font-bold mb-2">Carrinho vazio</h1>
+        <ShoppingBag className="mx-auto mb-4 text-gray-600" size={64} />
+        <h1 className="text-2xl font-bold text-white mb-2">Carrinho vazio</h1>
         <p className="text-gray-500 mb-6">
           Você ainda não adicionou produtos ao carrinho.
         </p>
         <Link
           href="/loja"
-          className="bg-amber-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-amber-600 transition"
+          className="bg-primary text-black font-semibold px-6 py-3 rounded-xl hover:bg-primary-light transition"
         >
           Ver Produtos
         </Link>
@@ -29,15 +29,15 @@ export default function CarrinhoPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Carrinho</h1>
+      <h1 className="text-3xl font-bold text-white mb-8">Carrinho</h1>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex gap-4 bg-white border rounded-xl p-4"
+            className="flex gap-4 bg-dark-800 border border-dark-600 rounded-xl p-4"
           >
-            <div className="w-20 h-20 relative rounded-lg overflow-hidden bg-gray-100 shrink-0">
+            <div className="w-20 h-20 relative rounded-lg overflow-hidden bg-dark-700 shrink-0">
               {item.image ? (
                 <Image
                   src={item.image}
@@ -47,7 +47,7 @@ export default function CarrinhoPage() {
                   sizes="80px"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                <div className="w-full h-full flex items-center justify-center text-gray-600 text-xs">
                   Sem img
                 </div>
               )}
@@ -56,16 +56,16 @@ export default function CarrinhoPage() {
             <div className="flex-1 min-w-0">
               <Link
                 href={`/produto/${item.slug}`}
-                className="font-medium text-sm hover:text-amber-600 line-clamp-2"
+                className="font-medium text-sm text-gray-300 hover:text-primary line-clamp-2 transition"
               >
                 {item.name}
               </Link>
               {item.sku && (
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-gray-600 mt-0.5">
                   SKU: {item.sku}
                 </p>
               )}
-              <p className="text-amber-600 font-bold mt-1">
+              <p className="text-primary font-bold mt-1">
                 R$ {item.price.toFixed(2)}
               </p>
             </div>
@@ -73,23 +73,23 @@ export default function CarrinhoPage() {
             <div className="flex flex-col items-end justify-between">
               <button
                 onClick={() => removeItem(item.id)}
-                className="text-gray-400 hover:text-red-500 transition"
+                className="text-gray-600 hover:text-red-500 transition"
               >
                 <Trash2 size={16} />
               </button>
-              <div className="flex items-center border rounded-lg">
+              <div className="flex items-center bg-dark-700 border border-dark-500 rounded-lg">
                 <button
                   onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="p-1.5 hover:bg-gray-100"
+                  className="p-1.5 text-gray-400 hover:text-white"
                 >
                   <Minus size={14} />
                 </button>
-                <span className="px-3 text-sm font-medium">
+                <span className="px-3 text-sm font-medium text-white">
                   {item.quantity}
                 </span>
                 <button
                   onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="p-1.5 hover:bg-gray-100"
+                  className="p-1.5 text-gray-400 hover:text-white"
                 >
                   <Plus size={14} />
                 </button>
@@ -99,23 +99,26 @@ export default function CarrinhoPage() {
         ))}
       </div>
 
-      <div className="mt-8 bg-gray-50 rounded-xl p-6">
+      <div className="mt-8 bg-dark-800 border border-dark-600 rounded-2xl p-6">
         <div className="flex justify-between items-center mb-4">
-          <span className="text-gray-500">Subtotal</span>
-          <span className="text-2xl font-bold">
+          <span className="text-gray-400">Subtotal</span>
+          <span className="text-2xl font-bold text-white">
             R$ {totalPrice().toFixed(2)}
           </span>
         </div>
-        <p className="text-xs text-gray-400 mb-4">
+        <p className="text-xs text-gray-600 mb-4">
           Frete calculado no checkout.
         </p>
-        <button className="w-full bg-amber-500 text-white font-semibold py-3 rounded-lg hover:bg-amber-600 transition mb-2">
+        <Link
+          href="/login"
+          className="block w-full bg-primary text-black text-center font-semibold py-3.5 rounded-xl hover:bg-primary-light transition mb-3"
+        >
           Finalizar Compra
-        </button>
+        </Link>
         <div className="flex justify-between">
           <Link
             href="/loja"
-            className="text-sm text-amber-600 hover:underline"
+            className="text-sm text-primary hover:underline"
           >
             Continuar comprando
           </Link>

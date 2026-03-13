@@ -17,6 +17,7 @@ export function ProductDetail({
 }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
   const images = product.product_images || [];
@@ -34,13 +35,15 @@ export function ProductDetail({
         weight: product.weight,
       });
     }
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <Link
         href="/loja"
-        className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-amber-600 mb-6"
+        className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary mb-6"
       >
         <ChevronLeft size={16} /> Voltar para loja
       </Link>
@@ -48,7 +51,7 @@ export function ProductDetail({
       <div className="grid md:grid-cols-2 gap-8">
         {/* Images */}
         <div>
-          <div className="aspect-square relative bg-gray-100 rounded-xl overflow-hidden mb-3">
+          <div className="aspect-square relative bg-dark-800 border border-dark-600 rounded-xl overflow-hidden mb-3">
             {currentImage ? (
               <Image
                 src={currentImage.src}
@@ -59,21 +62,21 @@ export function ProductDetail({
                 priority
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
+              <div className="w-full h-full flex items-center justify-center text-gray-600">
                 Sem imagem
               </div>
             )}
           </div>
           {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto">
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {images.map((img, i) => (
                 <button
                   key={img.id}
                   onClick={() => setSelectedImage(i)}
                   className={`w-16 h-16 relative rounded-lg overflow-hidden shrink-0 border-2 transition ${
                     i === selectedImage
-                      ? "border-amber-500"
-                      : "border-transparent"
+                      ? "border-primary"
+                      : "border-dark-600 hover:border-dark-500"
                   }`}
                 >
                   <Image
@@ -94,97 +97,103 @@ export function ProductDetail({
           {product.brands && (
             <Link
               href={`/loja?marca=${product.brands.slug}`}
-              className="text-sm text-amber-600 font-medium hover:underline"
+              className="inline-block text-sm text-primary font-medium hover:underline bg-primary/10 px-3 py-1 rounded-full"
             >
               {product.brands.name}
             </Link>
           )}
-          <h1 className="text-2xl md:text-3xl font-bold mt-1 mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mt-3 mb-2">
             {product.name}
           </h1>
 
           {product.categories && (
             <Link
               href={`/loja?categoria=${product.categories.slug}`}
-              className="text-sm text-gray-500 hover:text-amber-600"
+              className="text-sm text-gray-500 hover:text-primary"
             >
               {product.categories.name}
             </Link>
           )}
 
           {product.sku && (
-            <p className="text-sm text-gray-400 mt-2">SKU: {product.sku}</p>
+            <p className="text-sm text-gray-600 mt-2">SKU: {product.sku}</p>
           )}
 
-          <div className="mt-6 mb-6">
+          <div className="mt-6 mb-6 p-4 bg-dark-800 border border-dark-600 rounded-xl">
             {product.sale_price ? (
               <div>
-                <span className="text-sm text-gray-400 line-through">
+                <span className="text-sm text-gray-600 line-through">
                   R$ {product.regular_price.toFixed(2)}
                 </span>
-                <span className="text-3xl font-bold text-amber-600 ml-2">
+                <span className="text-3xl font-bold text-primary ml-2">
                   R$ {product.sale_price.toFixed(2)}
                 </span>
               </div>
             ) : (
-              <span className="text-3xl font-bold">
+              <span className="text-3xl font-bold text-white">
                 R$ {product.price.toFixed(2)}
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-4 mb-6">
-            <div className="flex items-center border rounded-lg">
+            <div className="flex items-center bg-dark-800 border border-dark-600 rounded-xl">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="p-2 hover:bg-gray-100"
+                className="p-3 text-gray-400 hover:text-white transition"
               >
                 <Minus size={16} />
               </button>
-              <span className="px-4 font-medium">{quantity}</span>
+              <span className="px-4 font-medium text-white">{quantity}</span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="p-2 hover:bg-gray-100"
+                className="p-3 text-gray-400 hover:text-white transition"
               >
                 <Plus size={16} />
               </button>
             </div>
             <button
               onClick={handleAdd}
-              className="flex-1 flex items-center justify-center gap-2 bg-amber-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-amber-600 transition"
+              className={`flex-1 flex items-center justify-center gap-2 font-semibold py-3.5 px-6 rounded-xl transition-all ${
+                added
+                  ? "bg-green-500 text-white"
+                  : "bg-primary text-black hover:bg-primary-light hover:scale-[1.02]"
+              }`}
             >
               <ShoppingCart size={20} />
-              Adicionar ao Carrinho
+              {added ? "Adicionado!" : "Adicionar ao Carrinho"}
             </button>
           </div>
 
-          {/* Details */}
+          {/* Specs */}
           {(product.weight > 0 || product.length > 0) && (
-            <div className="border-t pt-4 mt-4">
-              <h3 className="font-semibold mb-2 text-sm">Especificações</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+            <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
+              <h3 className="font-semibold mb-3 text-sm text-white">
+                Especificações
+              </h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
                 {product.weight > 0 && (
-                  <div>
-                    <span className="text-gray-400">Peso:</span>{" "}
-                    {product.weight} kg
+                  <div className="flex justify-between bg-dark-700 rounded-lg px-3 py-2">
+                    <span className="text-gray-500">Peso</span>
+                    <span className="text-white">{product.weight} kg</span>
                   </div>
                 )}
                 {product.length > 0 && (
-                  <div>
-                    <span className="text-gray-400">Comp.:</span>{" "}
-                    {product.length} cm
+                  <div className="flex justify-between bg-dark-700 rounded-lg px-3 py-2">
+                    <span className="text-gray-500">Comp.</span>
+                    <span className="text-white">{product.length} cm</span>
                   </div>
                 )}
                 {product.width > 0 && (
-                  <div>
-                    <span className="text-gray-400">Larg.:</span>{" "}
-                    {product.width} cm
+                  <div className="flex justify-between bg-dark-700 rounded-lg px-3 py-2">
+                    <span className="text-gray-500">Larg.</span>
+                    <span className="text-white">{product.width} cm</span>
                   </div>
                 )}
                 {product.height > 0 && (
-                  <div>
-                    <span className="text-gray-400">Alt.:</span>{" "}
-                    {product.height} cm
+                  <div className="flex justify-between bg-dark-700 rounded-lg px-3 py-2">
+                    <span className="text-gray-500">Alt.</span>
+                    <span className="text-white">{product.height} cm</span>
                   </div>
                 )}
               </div>
@@ -195,10 +204,10 @@ export function ProductDetail({
 
       {/* Description */}
       {product.description && (
-        <div className="mt-12 border-t pt-8">
-          <h2 className="text-xl font-bold mb-4">Descrição</h2>
+        <div className="mt-12 bg-dark-800 border border-dark-600 rounded-xl p-6">
+          <h2 className="text-xl font-bold text-white mb-4">Descrição</h2>
           <div
-            className="prose max-w-none text-gray-600"
+            className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
         </div>
@@ -206,8 +215,10 @@ export function ProductDetail({
 
       {/* Related */}
       {related.length > 0 && (
-        <div className="mt-12 border-t pt-8">
-          <h2 className="text-xl font-bold mb-6">Produtos Relacionados</h2>
+        <div className="mt-12">
+          <h2 className="text-xl font-bold text-white mb-6">
+            Produtos Relacionados
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />

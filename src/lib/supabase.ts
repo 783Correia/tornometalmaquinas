@@ -50,3 +50,41 @@ export type Product = {
   brands?: Brand
   product_images?: ProductImage[]
 }
+
+export type Customer = {
+  id: string
+  full_name: string
+  email: string
+  phone: string | null
+  cpf: string | null
+  address_street: string | null
+  address_number: string | null
+  address_complement: string | null
+  address_neighborhood: string | null
+  address_city: string | null
+  address_state: string | null
+  address_zip: string | null
+}
+
+export type Order = {
+  id: number
+  customer_id: string
+  status: string
+  total: number
+  shipping_cost: number
+  payment_method: string | null
+  payment_status: string
+  tracking_code: string | null
+  notes: string | null
+  created_at: string
+  order_items?: OrderItem[]
+}
+
+export type OrderItem = {
+  id: number
+  order_id: number
+  product_id: number
+  quantity: number
+  price: number
+  product_name: string
+}

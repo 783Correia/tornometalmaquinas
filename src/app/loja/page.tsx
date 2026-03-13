@@ -63,36 +63,27 @@ export default async function LojaPage({ searchParams }: Props) {
     .select("*")
     .order("name");
 
-  const activeCategory = params.categoria;
-  const activeBrand = params.marca;
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">Loja</h1>
-      {params.busca && (
-        <p className="text-gray-500 mb-4">
-          Resultados para: &quot;{params.busca}&quot; ({count} encontrados)
-        </p>
-      )}
-      {activeCategory && (
-        <p className="text-gray-500 mb-4">
-          Categoria:{" "}
-          <span className="text-amber-600 font-medium">{activeCategory}</span>
-        </p>
-      )}
-      {activeBrand && (
-        <p className="text-gray-500 mb-4">
-          Marca:{" "}
-          <span className="text-amber-600 font-medium">{activeBrand}</span>
-        </p>
-      )}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-white">
+          {params.busca
+            ? `Resultados para "${params.busca}"`
+            : params.categoria
+            ? `Categoria: ${params.categoria}`
+            : params.marca
+            ? `Marca: ${params.marca}`
+            : "Todos os Produtos"}
+        </h1>
+        <p className="text-gray-500 mt-1">{count || 0} produtos encontrados</p>
+      </div>
 
-      <div className="flex flex-col md:flex-row gap-8 mt-6">
+      <div className="flex flex-col md:flex-row gap-8">
         <FilterSidebar
           categories={categories || []}
           brands={brands || []}
-          activeCategory={activeCategory}
-          activeBrand={activeBrand}
+          activeCategory={params.categoria}
+          activeBrand={params.marca}
         />
 
         <div className="flex-1">
@@ -108,21 +99,20 @@ export default async function LojaPage({ searchParams }: Props) {
                 <div className="flex justify-center gap-2 mt-8">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                     (p) => {
-                      const params2 = new URLSearchParams();
-                      if (params.categoria)
-                        params2.set("categoria", params.categoria);
-                      if (params.marca) params2.set("marca", params.marca);
-                      if (params.busca) params2.set("busca", params.busca);
-                      params2.set("pagina", p.toString());
+                      const qs = new URLSearchParams();
+                      if (params.categoria) qs.set("categoria", params.categoria);
+                      if (params.marca) qs.set("marca", params.marca);
+                      if (params.busca) qs.set("busca", params.busca);
+                      qs.set("pagina", p.toString());
 
                       return (
                         <a
                           key={p}
-                          href={`/loja?${params2.toString()}`}
-                          className={`px-3 py-2 rounded-lg text-sm ${
+                          href={`/loja?${qs.toString()}`}
+                          className={`px-3.5 py-2 rounded-lg text-sm font-medium transition ${
                             p === page
-                              ? "bg-amber-500 text-white"
-                              : "bg-gray-100 hover:bg-gray-200"
+                              ? "bg-primary text-black"
+                              : "bg-dark-800 border border-dark-600 text-gray-400 hover:border-primary hover:text-primary"
                           }`}
                         >
                           {p}

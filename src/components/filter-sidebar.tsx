@@ -16,18 +16,18 @@ export function FilterSidebar({
 }: Props) {
   return (
     <aside className="w-full md:w-56 shrink-0">
-      <div className="mb-6">
-        <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-gray-500">
+      <div className="bg-dark-800 border border-dark-600 rounded-xl p-4 mb-4">
+        <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-500 mb-3">
           Categorias
         </h3>
-        <ul className="space-y-1">
+        <ul className="space-y-0.5">
           <li>
             <Link
               href="/loja"
-              className={`block px-3 py-1.5 rounded text-sm transition ${
-                !activeCategory
-                  ? "bg-amber-500 text-white"
-                  : "hover:bg-gray-100"
+              className={`block px-3 py-2 rounded-lg text-sm transition ${
+                !activeCategory && !activeBrand
+                  ? "bg-primary text-black font-medium"
+                  : "text-gray-400 hover:bg-dark-700 hover:text-white"
               }`}
             >
               Todas
@@ -39,10 +39,10 @@ export function FilterSidebar({
               <li key={cat.id}>
                 <Link
                   href={`/loja?categoria=${cat.slug}`}
-                  className={`block px-3 py-1.5 rounded text-sm transition ${
+                  className={`block px-3 py-2 rounded-lg text-sm transition ${
                     activeCategory === cat.slug
-                      ? "bg-amber-500 text-white"
-                      : "hover:bg-gray-100"
+                      ? "bg-primary text-black font-medium"
+                      : "text-gray-400 hover:bg-dark-700 hover:text-white"
                   }`}
                 >
                   {cat.name}
@@ -52,31 +52,19 @@ export function FilterSidebar({
         </ul>
       </div>
 
-      <div>
-        <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-gray-500">
+      <div className="bg-dark-800 border border-dark-600 rounded-xl p-4">
+        <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-500 mb-3">
           Marcas
         </h3>
-        <ul className="space-y-1">
-          <li>
-            <Link
-              href="/loja"
-              className={`block px-3 py-1.5 rounded text-sm transition ${
-                !activeBrand
-                  ? "bg-amber-500 text-white"
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              Todas
-            </Link>
-          </li>
+        <ul className="space-y-0.5">
           {brands.map((brand) => (
             <li key={brand.id}>
               <Link
                 href={`/loja?marca=${brand.slug}`}
-                className={`block px-3 py-1.5 rounded text-sm transition ${
+                className={`block px-3 py-2 rounded-lg text-sm transition ${
                   activeBrand === brand.slug
-                    ? "bg-amber-500 text-white"
-                    : "hover:bg-gray-100"
+                    ? "bg-primary text-black font-medium"
+                    : "text-gray-400 hover:bg-dark-700 hover:text-white"
                 }`}
               >
                 {brand.name}

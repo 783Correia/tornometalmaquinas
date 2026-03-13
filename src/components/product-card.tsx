@@ -16,7 +16,7 @@ export function ProductCard({ product }: { product: Product }) {
       id: product.id,
       name: product.name,
       slug: product.slug,
-      price: product.price,
+      price: product.sale_price || product.price,
       image: image?.src || "",
       sku: product.sku,
       weight: product.weight,
@@ -26,9 +26,9 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={`/produto/${product.slug}`}
-      className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+      className="group bg-dark-800 rounded-xl border border-dark-600 overflow-hidden hover:border-primary/50 hover:shadow-[0_0_20px_rgba(245,158,11,0.1)] transition-all"
     >
-      <div className="aspect-square relative bg-gray-100 overflow-hidden">
+      <div className="aspect-square relative bg-dark-700 overflow-hidden">
         {image ? (
           <Image
             src={image.src}
@@ -38,7 +38,7 @@ export function ProductCard({ product }: { product: Product }) {
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
+          <div className="w-full h-full flex items-center justify-center text-gray-600">
             Sem imagem
           </div>
         )}
@@ -49,32 +49,35 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
       <div className="p-3">
-        <p className="text-xs text-amber-600 font-medium mb-1">
+        <p className="text-xs text-primary font-medium mb-1">
           {product.categories?.name}
+          {product.brands && (
+            <span className="text-gray-500"> | {product.brands.name}</span>
+          )}
         </p>
-        <h3 className="text-sm font-medium line-clamp-2 mb-2 group-hover:text-amber-600 transition">
+        <h3 className="text-sm font-medium text-gray-300 line-clamp-2 mb-2 group-hover:text-white transition">
           {product.name}
         </h3>
         <div className="flex items-center justify-between">
           <div>
             {product.sale_price ? (
               <>
-                <span className="text-xs text-gray-400 line-through">
+                <span className="text-xs text-gray-600 line-through">
                   R$ {product.regular_price.toFixed(2)}
                 </span>
-                <span className="text-lg font-bold text-amber-600 ml-1">
+                <span className="text-lg font-bold text-primary ml-1">
                   R$ {product.sale_price.toFixed(2)}
                 </span>
               </>
             ) : (
-              <span className="text-lg font-bold text-gray-900">
+              <span className="text-lg font-bold text-white">
                 R$ {product.price.toFixed(2)}
               </span>
             )}
           </div>
           <button
             onClick={handleAdd}
-            className="p-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition"
+            className="p-2 bg-primary text-black rounded-lg hover:bg-primary-light transition hover:scale-105"
           >
             <ShoppingCart size={16} />
           </button>
