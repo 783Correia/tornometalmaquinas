@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { ProductCard } from "@/components/product-card";
 import { Wrench, Truck, ShieldCheck, Headphones } from "lucide-react";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 async function getFeaturedProducts() {
   const { data } = await supabase

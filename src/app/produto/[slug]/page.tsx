@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product-detail";
 import type { Metadata } from "next";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{ slug: string }>;

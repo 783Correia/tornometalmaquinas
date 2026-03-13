@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { ProductCard } from "@/components/product-card";
 import { FilterSidebar } from "@/components/filter-sidebar";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 type Props = {
   searchParams: Promise<{
