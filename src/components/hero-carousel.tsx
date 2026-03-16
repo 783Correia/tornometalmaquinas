@@ -14,8 +14,8 @@ const slides = [
     description: "Peças agrícolas de reposição com precisão milimétrica desde 1999",
     cta: "Ver Catálogo",
     href: "/loja",
-    align: "left" as const,
-    overlay: "gradient-right" as const,
+    textPosition: "left" as const,
+    theme: "dark" as const, // dark bg = white text
   },
   {
     image: "/banner-2.png",
@@ -25,8 +25,8 @@ const slides = [
     description: "Peças fabricadas com os melhores materiais para máxima resistência",
     cta: "Conhecer Peças",
     href: "/loja",
-    align: "left" as const,
-    overlay: "none" as const,
+    textPosition: "left-box" as const,
+    theme: "light" as const, // light bg = dark text
   },
   {
     image: "/banner-3.png",
@@ -36,8 +36,8 @@ const slides = [
     description: "Compatível com Semeato, Jumil, Imasa, Tatu e mais marcas",
     cta: "Ver Marcas",
     href: "/loja",
-    align: "right" as const,
-    overlay: "none" as const,
+    textPosition: "right-box" as const,
+    theme: "light" as const,
   },
   {
     image: "/banner-4.png",
@@ -47,8 +47,8 @@ const slides = [
     description: "Tecnologia de ponta na fabricação de peças agrícolas de reposição",
     cta: "Comprar Agora",
     href: "/loja",
-    align: "left" as const,
-    overlay: "gradient-right" as const,
+    textPosition: "left" as const,
+    theme: "dark" as const,
   },
 ];
 
@@ -64,19 +64,20 @@ export function HeroCarousel() {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(next, 5000);
+    const timer = setInterval(next, 7000);
     return () => clearInterval(timer);
   }, [next]);
+
+  const isLight = (theme: string) => theme === "light";
 
   return (
     <section className="relative w-full overflow-hidden bg-gray-900">
       <div
-        className="flex transition-transform duration-500 ease-in-out"
+        className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
         {slides.map((slide, i) => (
           <div key={i} className="w-full shrink-0 relative">
-            {/* Mobile: taller ratio / Desktop: wide banner */}
             <div className="relative w-full aspect-[4/3] sm:aspect-[16/7] md:aspect-[1440/480]">
               <Image
                 src={slide.image}
@@ -87,54 +88,53 @@ export function HeroCarousel() {
                 priority={i === 0}
               />
 
-              {/* Overlay */}
-              {slide.overlay === "gradient-right" && (
-                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-              )}
-              {slide.overlay === "none" && (
-                <div className="absolute inset-0 bg-black/10 md:bg-transparent" />
+              {/* Overlay only for dark theme slides */}
+              {!isLight(slide.theme) && (
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
               )}
 
               {/* Text content */}
-              <div className="absolute inset-0 flex items-center">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full">
+              <div
+                className={`absolute inset-0 flex items-center ${
+                  slide.textPosition === "right-box"
+                    ? "justify-end"
+                    : "justify-start"
+                }`}
+              >
+                <div
+                  className={`px-6 sm:px-10 md:px-16 lg:px-20 w-full max-w-7xl mx-auto flex ${
+                    slide.textPosition === "right-box"
+                      ? "justify-end"
+                      : "justify-start"
+                  }`}
+                >
                   <div
-                    className={`max-w-[280px] sm:max-w-sm md:max-w-lg ${
-                      slide.align === "right" ? "ml-auto text-right" : ""
+                    className={`max-w-[260px] sm:max-w-xs md:max-w-md lg:max-w-lg ${
+                      slide.textPosition === "right-box" ? "text-right" : ""
                     }`}
                   >
                     <h2
-                      className={`text-xl sm:text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight drop-shadow-lg ${
-                        slide.overlay === "none"
-                          ? "text-gray-900"
-                          : "text-white"
+                      className={`text-lg sm:text-xl md:text-3xl lg:text-5xl font-extrabold leading-tight ${
+                        isLight(slide.theme) ? "text-gray-900" : "text-white drop-shadow-lg"
                       }`}
                     >
                       {slide.title}
                       <br />
-                      <span
-                        className={
-                          slide.overlay === "none"
-                            ? "text-primary"
-                            : "text-blue-400"
-                        }
-                      >
+                      <span className={isLight(slide.theme) ? "text-primary" : "text-blue-400"}>
                         {slide.subtitle}
                       </span>
                     </h2>
                     <p
-                      className={`mt-2 md:mt-4 text-xs sm:text-sm md:text-base drop-shadow-md max-w-md ${
-                        slide.overlay === "none"
-                          ? "text-gray-600"
-                          : "text-gray-200"
-                      } ${slide.align === "right" ? "ml-auto" : ""}`}
+                      className={`mt-1.5 sm:mt-2 md:mt-3 text-[11px] sm:text-xs md:text-sm lg:text-base ${
+                        isLight(slide.theme) ? "text-gray-600" : "text-gray-200 drop-shadow-md"
+                      } ${slide.textPosition === "right-box" ? "ml-auto" : ""} max-w-sm`}
                     >
                       {slide.description}
                     </p>
                     <Link
                       href={slide.href}
-                      className={`inline-block mt-3 md:mt-5 font-semibold px-5 py-2 md:px-8 md:py-3 rounded-xl transition-all hover:scale-105 shadow-lg text-xs sm:text-sm md:text-base ${
-                        slide.overlay === "none"
+                      className={`inline-block mt-2.5 sm:mt-3 md:mt-5 font-semibold px-4 py-1.5 sm:px-5 sm:py-2 md:px-7 md:py-2.5 rounded-xl transition-all hover:scale-105 shadow-lg text-xs sm:text-sm md:text-base ${
+                        isLight(slide.theme)
                           ? "bg-primary text-white hover:bg-primary-dark"
                           : "bg-white text-primary hover:bg-blue-50"
                       }`}
@@ -152,17 +152,17 @@ export function HeroCarousel() {
       {/* Arrows */}
       <button
         onClick={prev}
-        className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 md:p-2 rounded-full shadow-md transition-all hover:scale-110"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 md:p-2.5 rounded-full shadow-md transition-all hover:scale-110"
         aria-label="Anterior"
       >
-        <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+        <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
       </button>
       <button
         onClick={next}
-        className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 md:p-2 rounded-full shadow-md transition-all hover:scale-110"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 md:p-2.5 rounded-full shadow-md transition-all hover:scale-110"
         aria-label="Próximo"
       >
-        <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+        <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
       </button>
 
       {/* Dots */}
