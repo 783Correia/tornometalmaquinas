@@ -87,9 +87,9 @@ export default function CadastroPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">CNPJ *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">CNPJ</label>
               <input type="text" value={form.cnpj} onChange={(e) => update("cnpj", formatCNPJ(e.target.value))}
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="00.000.000/0000-00" required />
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="00.000.000/0000-00" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Inscrição Estadual</label>

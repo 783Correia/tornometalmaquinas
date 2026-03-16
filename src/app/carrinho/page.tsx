@@ -97,7 +97,7 @@ export default function CarrinhoPage() {
               <span className="text-2xl font-bold text-primary">R$ {(totalPrice() + shippingCost).toFixed(2).replace(".", ",")}</span>
             </div>
           </div>
-          <Link href="/login" className="block w-full bg-primary text-white text-center font-semibold py-3.5 rounded-xl hover:bg-primary-dark transition mb-3">
+          <Link href="/checkout" className="block w-full bg-primary text-white text-center font-semibold py-3.5 rounded-xl hover:bg-primary-dark transition mb-3">
             Finalizar Compra
           </Link>
           <div className="flex justify-between">

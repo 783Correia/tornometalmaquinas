@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { LogIn, Eye, EyeOff } from "lucide-react";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/minha-conta";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,7 +23,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) { setError("E-mail ou senha incorretos."); setLoading(false); return; }
-    router.push("/minha-conta");
+    router.push(redirect);
   }
 
   return (
@@ -63,5 +66,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center text-gray-400">Carregando...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
