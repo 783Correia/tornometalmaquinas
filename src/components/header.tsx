@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ShoppingCart, Search, Menu, X, User, LogIn } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useState, useEffect } from "react";
@@ -34,12 +35,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-[#0d1b3e]">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-[70px] gap-6">
+        <div className="flex items-center justify-between h-[72px] gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 shrink-0">
-            <div className="w-12 h-12 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center">
-              <span className="text-white font-black text-xs">TM</span>
-            </div>
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <Image
+              src="/logo.png"
+              alt="TornoMetal"
+              width={56}
+              height={56}
+              className="rounded-full"
+              priority
+            />
             <div className="hidden sm:block">
               <span className="text-white font-bold text-lg tracking-wide">
                 TORNOMETAL
@@ -58,9 +64,7 @@ export function Header() {
               { href: "/contato", label: "CONTATO" },
             ].map((link, i) => (
               <div key={link.href} className="flex items-center">
-                {i > 0 && (
-                  <span className="text-blue-400/30 mx-2">|</span>
-                )}
+                {i > 0 && <span className="text-blue-400/30 mx-2">|</span>}
                 <Link
                   href={link.href}
                   className="text-sm font-medium text-white/80 hover:text-white tracking-wide transition"
@@ -72,10 +76,7 @@ export function Header() {
           </nav>
 
           {/* Search - Desktop */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden md:flex items-center flex-1 max-w-sm"
-          >
+          <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-sm">
             <div className="flex w-full bg-white rounded-lg overflow-hidden shadow-sm">
               <div className="flex items-center pl-3 text-gray-400">
                 <Search size={18} />
@@ -90,36 +91,22 @@ export function Header() {
             </div>
           </form>
 
-          {/* Right side - Auth + Cart */}
+          {/* Right side */}
           <div className="hidden md:flex items-center gap-5">
-            {/* Auth */}
             <div className="text-right">
               {user ? (
                 <Link href="/minha-conta" className="group">
-                  <span className="text-[11px] text-blue-300/50 block">
-                    Bem-vindo
-                  </span>
-                  <span className="text-sm font-bold text-primary-light hover:text-white transition">
-                    Minha Conta
-                  </span>
+                  <span className="text-[11px] text-blue-300/50 block">Bem-vindo</span>
+                  <span className="text-sm font-bold text-primary-light hover:text-white transition">Minha Conta</span>
                 </Link>
               ) : (
                 <Link href="/login" className="group">
-                  <span className="text-[11px] text-blue-300/50 block">
-                    Entrar / Cadastrar
-                  </span>
-                  <span className="text-sm font-bold text-primary-light hover:text-white transition">
-                    Minha Conta
-                  </span>
+                  <span className="text-[11px] text-blue-300/50 block">Entrar / Cadastrar</span>
+                  <span className="text-sm font-bold text-primary-light hover:text-white transition">Minha Conta</span>
                 </Link>
               )}
             </div>
-
-            {/* Cart */}
-            <Link
-              href="/carrinho"
-              className="relative text-white/80 hover:text-white transition"
-            >
+            <Link href="/carrinho" className="relative text-white/80 hover:text-white transition">
               <ShoppingCart size={26} />
               <span className="absolute -top-2 -right-2 bg-primary-light text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
                 {totalItems}
@@ -127,7 +114,7 @@ export function Header() {
             </Link>
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile */}
           <div className="flex md:hidden items-center gap-3">
             <Link href="/carrinho" className="relative text-white/80">
               <ShoppingCart size={22} />
@@ -137,10 +124,7 @@ export function Header() {
                 </span>
               )}
             </Link>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="p-1.5 text-white/80"
-            >
+            <button onClick={() => setMenuOpen(!menuOpen)} className="p-1.5 text-white/80">
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -152,16 +136,9 @@ export function Header() {
         <div className="md:hidden bg-[#0d1b3e] border-t border-white/10 px-4 pb-4">
           <form onSubmit={handleSearch} className="flex mt-3 mb-4">
             <div className="flex w-full bg-white rounded-lg overflow-hidden">
-              <div className="flex items-center pl-3 text-gray-400">
-                <Search size={16} />
-              </div>
-              <input
-                type="text"
-                placeholder="Pesquisar produtos..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="px-3 py-2.5 w-full text-sm outline-none"
-              />
+              <div className="flex items-center pl-3 text-gray-400"><Search size={16} /></div>
+              <input type="text" placeholder="Pesquisar produtos..." value={search}
+                onChange={(e) => setSearch(e.target.value)} className="px-3 py-2.5 w-full text-sm outline-none" />
             </div>
           </form>
           {[
@@ -169,12 +146,8 @@ export function Header() {
             { href: "/loja", label: "Todos os Produtos" },
             { href: "/contato", label: "Contato" },
           ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className="block py-2.5 text-white/70 hover:text-white border-b border-white/5 text-sm"
-            >
+            <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
+              className="block py-2.5 text-white/70 hover:text-white border-b border-white/5 text-sm">
               {link.label}
             </Link>
           ))}
@@ -187,13 +160,9 @@ export function Header() {
             ) : (
               <div className="flex gap-3">
                 <Link href="/login" onClick={() => setMenuOpen(false)}
-                  className="flex-1 text-center border border-white/20 text-white py-2.5 rounded-lg text-sm">
-                  Entrar
-                </Link>
+                  className="flex-1 text-center border border-white/20 text-white py-2.5 rounded-lg text-sm">Entrar</Link>
                 <Link href="/cadastro" onClick={() => setMenuOpen(false)}
-                  className="flex-1 text-center bg-primary-light text-white py-2.5 rounded-lg text-sm font-semibold">
-                  Cadastrar
-                </Link>
+                  className="flex-1 text-center bg-primary-light text-white py-2.5 rounded-lg text-sm font-semibold">Cadastrar</Link>
               </div>
             )}
           </div>
