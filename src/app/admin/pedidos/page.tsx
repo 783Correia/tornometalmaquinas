@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Search, Eye, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, Truck, Save } from "lucide-react";
 
 type Order = {
   id: number;
@@ -11,6 +11,8 @@ type Order = {
   total: number;
   shipping_cost: number;
   payment_method: string;
+  tracking_code: string | null;
+  notes: string | null;
   created_at: string;
   customers?: { full_name: string; email: string };
   order_items?: { id: number; product_name: string; quantity: number; price: number }[];
@@ -41,6 +43,11 @@ export default function AdminPedidos() {
 
   async function updateStatus(id: number, status: string) {
     await supabase.from("orders").update({ status }).eq("id", id);
+    load();
+  }
+
+  async function updateTracking(id: number, code: string) {
+    await supabase.from("orders").update({ tracking_code: code }).eq("id", id);
     load();
   }
 
@@ -131,17 +138,41 @@ export default function AdminPedidos() {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-3">
-                    <label className="text-sm font-medium text-gray-700">Alterar status:</label>
-                    <select value={order.status} onChange={(e) => updateStatus(order.id, e.target.value)}
-                      className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary transition">
-                      <option value="pending">Pendente</option>
-                      <option value="processing">Processando</option>
-                      <option value="shipped">Enviado</option>
-                      <option value="delivered">Entregue</option>
-                      <option value="cancelled">Cancelado</option>
-                    </select>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <label className="text-sm font-medium text-gray-700">Status:</label>
+                      <select value={order.status} onChange={(e) => updateStatus(order.id, e.target.value)}
+                        className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary transition">
+                        <option value="pending">Pendente</option>
+                        <option value="processing">Processando</option>
+                        <option value="shipped">Enviado</option>
+                        <option value="delivered">Entregue</option>
+                        <option value="cancelled">Cancelado</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Truck size={16} className="text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Código de rastreio"
+                        defaultValue={order.tracking_code || ""}
+                        onBlur={(e) => {
+                          if (e.target.value !== (order.tracking_code || "")) {
+                            updateTracking(order.id, e.target.value);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            updateTracking(order.id, (e.target as HTMLInputElement).value);
+                          }
+                        }}
+                        className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary transition w-52"
+                      />
+                    </div>
                   </div>
+                  {order.notes && (
+                    <p className="text-xs text-gray-400 mt-2">{order.notes}</p>
+                  )}
                 </div>
               )}
             </div>

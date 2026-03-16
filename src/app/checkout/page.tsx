@@ -101,6 +101,21 @@ export default function CheckoutPage() {
     if (!shipping) return;
     setPlacing(true);
 
+    // Validate stock before placing order
+    for (const item of items) {
+      const { data: product } = await supabase
+        .from("products")
+        .select("stock_quantity, manage_stock, name")
+        .eq("id", item.id)
+        .single();
+
+      if (product?.manage_stock && product.stock_quantity < item.quantity) {
+        alert(`Produto "${product.name}" tem apenas ${product.stock_quantity} unidade(s) em estoque.`);
+        setPlacing(false);
+        return;
+      }
+    }
+
     // Save address to customer profile
     await supabase.from("customers").update({
       address_zip: address.address_zip, address_street: address.address_street,

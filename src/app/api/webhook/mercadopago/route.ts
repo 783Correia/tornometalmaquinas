@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
@@ -10,9 +11,38 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+function verifyWebhookSignature(req: NextRequest, body: string): boolean {
+  const secret = process.env.MP_WEBHOOK_SECRET;
+  if (!secret) return true; // Skip if not configured yet
+
+  const xSignature = req.headers.get("x-signature");
+  const xRequestId = req.headers.get("x-request-id");
+  if (!xSignature || !xRequestId) return false;
+
+  const parts = xSignature.split(",");
+  const ts = parts.find((p) => p.trim().startsWith("ts="))?.split("=")[1];
+  const hash = parts.find((p) => p.trim().startsWith("v1="))?.split("=")[1];
+  if (!ts || !hash) return false;
+
+  const url = new URL(req.url);
+  const dataId = url.searchParams.get("data.id") || "";
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+  const computedHash = crypto.createHmac("sha256", secret).update(manifest).digest("hex");
+
+  return computedHash === hash;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const bodyText = await req.text();
+
+    // Verify webhook signature
+    if (!verifyWebhookSignature(req, bodyText)) {
+      console.error("Webhook signature verification failed");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    const body = JSON.parse(bodyText);
 
     if (body.type === "payment") {
       const payment = new Payment(client);
@@ -30,6 +60,23 @@ export async function POST(req: NextRequest) {
           payment_method: paymentData.payment_method_id || null,
           status,
         }).eq("id", orderId);
+
+        // Decrement stock on payment approval
+        if (paymentData.status === "approved") {
+          const { data: orderItems } = await supabase
+            .from("order_items")
+            .select("product_id, quantity")
+            .eq("order_id", orderId);
+
+          if (orderItems) {
+            for (const item of orderItems) {
+              await supabase.rpc("decrement_stock", {
+                p_product_id: item.product_id,
+                p_quantity: item.quantity,
+              });
+            }
+          }
+        }
       }
     }
 

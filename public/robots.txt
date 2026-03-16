@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout
+Disallow: /minha-conta
+Disallow: /pagamento/
+
+Sitemap: https://tornometalmaquinas.vercel.app/sitemap.xml

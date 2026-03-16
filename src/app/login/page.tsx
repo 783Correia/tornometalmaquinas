@@ -60,9 +60,14 @@ function LoginForm() {
             className="w-full bg-primary text-white font-semibold py-3 rounded-xl hover:bg-primary-dark transition disabled:opacity-50">
             {loading ? "Entrando..." : "Entrar"}
           </button>
-          <p className="text-center text-sm text-gray-500">
-            Não tem conta? <Link href="/cadastro" className="text-primary font-medium hover:underline">Cadastre-se</Link>
-          </p>
+          <div className="text-center space-y-2">
+            <Link href="/esqueci-senha" className="block text-sm text-gray-400 hover:text-primary transition">
+              Esqueci minha senha
+            </Link>
+            <p className="text-sm text-gray-500">
+              Não tem conta? <Link href="/cadastro" className="text-primary font-medium hover:underline">Cadastre-se</Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>

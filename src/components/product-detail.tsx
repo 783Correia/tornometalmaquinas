@@ -159,7 +159,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
         {product.description && (
           <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Descrição do Produto</h2>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.description }} />
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.description.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/on\w+\s*=\s*["'][^"']*["']/gi, "").replace(/javascript:/gi, "") }} />
           </div>
         )}
 

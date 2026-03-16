@@ -59,10 +59,13 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4">Contato</h4>
+            <h4 className="text-white font-semibold mb-4">Institucional</h4>
             <ul className="space-y-2.5 text-sm">
-              <li>Everton Lopes</li>
-              <li>tornometalevertonlopes.com.br</li>
+              <li><Link href="/termos" className="hover:text-primary transition">Termos de Uso</Link></li>
+              <li><Link href="/privacidade" className="hover:text-primary transition">Política de Privacidade</Link></li>
+              <li><Link href="/trocas" className="hover:text-primary transition">Trocas e Devoluções</Link></li>
+              <li><Link href="/contato" className="hover:text-primary transition">Contato</Link></li>
+              <li className="pt-2 text-gray-500">Tel: (54) 3315-3969</li>
             </ul>
           </div>
         </div>
