@@ -137,30 +137,35 @@ export default function CheckoutPage() {
       const { data: profile } = await supabase.from("customers").select("full_name, email").eq("id", userId).single();
 
       // Create Mercado Pago preference
-      const mpRes = await fetch("/api/payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: order.id,
-          items: items.map((item) => ({
-            name: item.name,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          shipping: shipping ? { price: shipping.price } : null,
-          payer: { email: profile?.email || user?.email, name: profile?.full_name || "" },
-        }),
-      });
-      const mpData = await mpRes.json();
+      try {
+        const mpRes = await fetch("/api/payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: order.id,
+            items: items.map((item) => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+            shipping: shipping ? { price: shipping.price } : null,
+            payer: { email: profile?.email || user?.email, name: profile?.full_name || "" },
+          }),
+        });
+        const mpData = await mpRes.json();
 
-      if (mpData.init_point) {
-        clearCart();
-        window.location.href = mpData.init_point;
-      } else {
-        // Fallback: order created but payment failed to init
-        clearCart();
-        router.push(`/pedido-confirmado?id=${order.id}`);
+        if (mpData.init_point) {
+          clearCart();
+          window.location.href = mpData.init_point;
+          return;
+        }
+      } catch (err) {
+        console.error("MP error:", err);
       }
+
+      // Fallback: go to order confirmation
+      clearCart();
+      router.push(`/pedido-confirmado?id=${order.id}`);
     } else {
       setPlacing(false);
     }

@@ -48,8 +48,9 @@ export async function POST(req: NextRequest) {
       id: result.id,
       init_point: result.init_point,
     });
-  } catch (err) {
-    console.error("MP Error:", err);
-    return NextResponse.json({ error: "Erro ao criar pagamento" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("MP Error:", message);
+    return NextResponse.json({ error: "Erro ao criar pagamento", detail: message }, { status: 500 });
   }
 }
