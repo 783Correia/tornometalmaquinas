@@ -53,7 +53,15 @@ export default function MinhaContaPage() {
   }
 
   if (loading) return <div className="min-h-[60vh] flex items-center justify-center text-gray-400">Carregando...</div>;
-  if (!customer) return null;
+  if (!customer) return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-gray-500 mb-4">Perfil não encontrado. Faça login novamente.</p>
+        <button onClick={() => { supabase.auth.signOut(); router.push("/login"); }}
+          className="bg-primary text-white px-6 py-3 rounded-xl hover:bg-primary-dark transition">Ir para Login</button>
+      </div>
+    </div>
+  );
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "perfil", label: "Perfil", icon: <User size={18} /> },
