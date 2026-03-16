@@ -8,13 +8,19 @@ import { Wrench, Truck, ShieldCheck, Headphones } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 async function getFeaturedProducts() {
+  // Get recent products that have images
   const { data } = await supabase
     .from("products")
     .select("*, categories(*), brands(*), product_images(*)")
     .eq("status", "publish")
     .order("created_at", { ascending: false })
-    .limit(8);
-  return data || [];
+    .limit(40);
+
+  // Filter only products with at least one image
+  const withImages = (data || []).filter(
+    (p) => p.product_images && p.product_images.length > 0
+  );
+  return withImages.slice(0, 8);
 }
 
 async function getBrands() {
@@ -104,8 +110,11 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Categorias - Carrossel circular */}
+      <CategoryCarousel categories={categories} />
+
       {/* Produtos recentes */}
-      <section className="py-14 bg-gray-50">
+      <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -124,11 +133,8 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Categorias - Carrossel circular */}
-      <CategoryCarousel categories={categories} />
-
       {/* Sobre */}
-      <section className="py-14 bg-white">
+      <section className="py-14 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Sobre a TornoMetal</h2>
           <div className="space-y-5 text-gray-600 leading-relaxed">

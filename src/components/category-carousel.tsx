@@ -27,7 +27,7 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
   if (categories.length === 0) return null;
 
   return (
-    <section className="py-14 bg-gray-50">
+    <section className="py-10 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Categorias</h2>
