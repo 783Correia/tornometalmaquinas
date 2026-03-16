@@ -17,15 +17,23 @@ export async function POST(req: NextRequest) {
   const payload = {
     from: { postal_code: FROM_CEP },
     to: { postal_code: cleanCep },
-    products: products.map((p: { weight: number; width: number; height: number; length: number; quantity: number; price: number }) => ({
-      id: "1",
-      width: p.width || 11,
-      height: p.height || 11,
-      length: p.length || 16,
-      weight: p.weight || 0.3,
-      insurance_value: p.price || 0,
-      quantity: p.quantity || 1,
-    })),
+    products: products.map((p: { weight: number; width: number; height: number; length: number; quantity: number; price: number }, i: number) => {
+      // Ensure weight is reasonable (max 29kg per item, min 0.1kg)
+      let weight = p.weight || 0.3;
+      if (weight > 100) weight = weight / 1000; // probably in grams, convert to kg
+      if (weight > 29) weight = 29;
+      if (weight < 0.1) weight = 0.1;
+
+      return {
+        id: String(i + 1),
+        width: Math.min(p.width || 11, 100),
+        height: Math.min(p.height || 11, 100),
+        length: Math.min(p.length || 16, 100),
+        weight,
+        insurance_value: p.price || 0,
+        quantity: Math.min(p.quantity || 1, 10),
+      };
+    }),
   };
 
   try {
