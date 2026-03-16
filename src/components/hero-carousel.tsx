@@ -14,33 +14,41 @@ const slides = [
     description: "Peças agrícolas de reposição com precisão milimétrica desde 1999",
     cta: "Ver Catálogo",
     href: "/loja",
+    align: "left" as const,
+    overlay: "gradient-right" as const,
   },
   {
     image: "/banner-2.png",
     alt: "Peças TornoMetal com durabilidade garantida",
     title: "Durabilidade que",
     subtitle: "Garante sua Produtividade",
-    description: "Peças fabricadas com os melhores materiais para máxima resistência no campo",
+    description: "Peças fabricadas com os melhores materiais para máxima resistência",
     cta: "Conhecer Peças",
     href: "/loja",
+    align: "left" as const,
+    overlay: "none" as const,
   },
   {
     image: "/banner-3.png",
     alt: "Peças para Semeato, Jumil, Imasa, Tatu e mais",
     title: "Catálogo Completo",
     subtitle: "para sua Plantadeira",
-    description: "Peças compatíveis com Semeato, Jumil, Imasa, Tatu Marchesan e mais marcas",
+    description: "Compatível com Semeato, Jumil, Imasa, Tatu e mais marcas",
     cta: "Ver Marcas",
     href: "/loja",
+    align: "right" as const,
+    overlay: "none" as const,
   },
   {
     image: "/banner-4.png",
     alt: "Inovação e precisão em peças agrícolas TornoMetal",
     title: "Inovação e Precisão",
     subtitle: "em Cada Peça",
-    description: "Tecnologia de ponta aplicada na fabricação de peças agrícolas de reposição",
+    description: "Tecnologia de ponta na fabricação de peças agrícolas de reposição",
     cta: "Comprar Agora",
     href: "/loja",
+    align: "left" as const,
+    overlay: "gradient-right" as const,
   },
 ];
 
@@ -68,7 +76,8 @@ export function HeroCarousel() {
       >
         {slides.map((slide, i) => (
           <div key={i} className="w-full shrink-0 relative">
-            <div className="relative w-full" style={{ aspectRatio: "1440/480" }}>
+            {/* Mobile: taller ratio / Desktop: wide banner */}
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/7] md:aspect-[1440/480]">
               <Image
                 src={slide.image}
                 alt={slide.alt}
@@ -77,24 +86,58 @@ export function HeroCarousel() {
                 sizes="100vw"
                 priority={i === 0}
               />
-              {/* Dark overlay for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
 
-              {/* SEO-friendly HTML text overlay */}
+              {/* Overlay */}
+              {slide.overlay === "gradient-right" && (
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+              )}
+              {slide.overlay === "none" && (
+                <div className="absolute inset-0 bg-black/10 md:bg-transparent" />
+              )}
+
+              {/* Text content */}
               <div className="absolute inset-0 flex items-center">
-                <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
-                  <div className="max-w-xl">
-                    <h2 className="text-2xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight drop-shadow-lg">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full">
+                  <div
+                    className={`max-w-[280px] sm:max-w-sm md:max-w-lg ${
+                      slide.align === "right" ? "ml-auto text-right" : ""
+                    }`}
+                  >
+                    <h2
+                      className={`text-xl sm:text-2xl md:text-4xl lg:text-5xl font-extrabold leading-tight drop-shadow-lg ${
+                        slide.overlay === "none"
+                          ? "text-gray-900"
+                          : "text-white"
+                      }`}
+                    >
                       {slide.title}
                       <br />
-                      <span className="text-blue-400">{slide.subtitle}</span>
+                      <span
+                        className={
+                          slide.overlay === "none"
+                            ? "text-primary"
+                            : "text-blue-400"
+                        }
+                      >
+                        {slide.subtitle}
+                      </span>
                     </h2>
-                    <p className="mt-3 md:mt-4 text-sm md:text-lg text-gray-200 drop-shadow-md max-w-md">
+                    <p
+                      className={`mt-2 md:mt-4 text-xs sm:text-sm md:text-base drop-shadow-md max-w-md ${
+                        slide.overlay === "none"
+                          ? "text-gray-600"
+                          : "text-gray-200"
+                      } ${slide.align === "right" ? "ml-auto" : ""}`}
+                    >
                       {slide.description}
                     </p>
                     <Link
                       href={slide.href}
-                      className="inline-block mt-4 md:mt-6 bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 md:px-8 md:py-3 rounded-xl transition-all hover:scale-105 shadow-lg text-sm md:text-base"
+                      className={`inline-block mt-3 md:mt-5 font-semibold px-5 py-2 md:px-8 md:py-3 rounded-xl transition-all hover:scale-105 shadow-lg text-xs sm:text-sm md:text-base ${
+                        slide.overlay === "none"
+                          ? "bg-primary text-white hover:bg-primary-dark"
+                          : "bg-white text-primary hover:bg-blue-50"
+                      }`}
                     >
                       {slide.cta}
                     </Link>
@@ -109,27 +152,29 @@ export function HeroCarousel() {
       {/* Arrows */}
       <button
         onClick={prev}
-        className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md transition-all hover:scale-110"
+        className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 md:p-2 rounded-full shadow-md transition-all hover:scale-110"
         aria-label="Anterior"
       >
-        <ChevronLeft size={24} />
+        <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
       </button>
       <button
         onClick={next}
-        className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-md transition-all hover:scale-110"
+        className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 md:p-2 rounded-full shadow-md transition-all hover:scale-110"
         aria-label="Próximo"
       >
-        <ChevronRight size={24} />
+        <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
         {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`w-3 h-3 rounded-full transition-all ${
-              i === current ? "bg-white scale-110 shadow-md" : "bg-white/50 hover:bg-white/70"
+            className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all ${
+              i === current
+                ? "bg-white scale-110 shadow-md"
+                : "bg-white/50 hover:bg-white/70"
             }`}
             aria-label={`Banner ${i + 1}`}
           />

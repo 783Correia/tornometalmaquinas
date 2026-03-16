@@ -51,47 +51,47 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         )}
       </div>
-      <div className="p-3.5">
-        <div className="flex items-center gap-1.5 mb-1.5">
+      <div className="p-2.5 md:p-3.5">
+        <div className="flex items-center gap-1 md:gap-1.5 mb-1 md:mb-1.5">
           {product.brands && (
-            <span className="text-[11px] font-semibold text-primary bg-blue-50 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] md:text-[11px] font-semibold text-primary bg-blue-50 px-1.5 md:px-2 py-0.5 rounded-full truncate max-w-[100px] md:max-w-none">
               {product.brands.name}
             </span>
           )}
           {product.categories && (
-            <span className="text-[11px] text-gray-400">
+            <span className="text-[10px] md:text-[11px] text-gray-400 hidden sm:inline">
               {product.categories.name}
             </span>
           )}
         </div>
-        <h3 className="text-sm font-medium text-gray-800 line-clamp-2 mb-2 group-hover:text-primary transition min-h-[40px]">
+        <h3 className="text-xs md:text-sm font-medium text-gray-800 line-clamp-2 mb-1.5 md:mb-2 group-hover:text-primary transition min-h-[32px] md:min-h-[40px]">
           {product.name}
         </h3>
         {product.sku && (
-          <p className="text-[11px] text-gray-400 mb-2">SKU: {product.sku}</p>
+          <p className="text-[10px] md:text-[11px] text-gray-400 mb-1.5 md:mb-2 hidden sm:block">SKU: {product.sku}</p>
         )}
         <div className="flex items-center justify-between">
           <div>
             {product.sale_price ? (
               <div>
-                <span className="text-xs text-gray-400 line-through">
+                <span className="text-[10px] md:text-xs text-gray-400 line-through">
                   R$ {product.regular_price.toFixed(2)}
                 </span>
-                <span className="text-lg font-bold text-success block -mt-0.5">
+                <span className="text-sm md:text-lg font-bold text-success block -mt-0.5">
                   R$ {product.sale_price.toFixed(2)}
                 </span>
               </div>
             ) : (
-              <span className="text-lg font-bold text-gray-900">
+              <span className="text-sm md:text-lg font-bold text-gray-900">
                 R$ {product.price.toFixed(2)}
               </span>
             )}
           </div>
           <button
             onClick={handleAdd}
-            className="p-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition hover:scale-105 shadow-sm"
+            className="p-2 md:p-2.5 bg-primary text-white rounded-lg md:rounded-xl hover:bg-primary-dark transition hover:scale-105 shadow-sm"
           >
-            <ShoppingCart size={16} />
+            <ShoppingCart className="w-3.5 h-3.5 md:w-4 md:h-4" />
           </button>
         </div>
       </div>
