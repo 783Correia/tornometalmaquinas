@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { ProductCard } from "@/components/product-card";
 import { HeroCarousel } from "@/components/hero-carousel";
+import { CategoryCarousel } from "@/components/category-carousel";
 import { Wrench, Truck, ShieldCheck, Headphones } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -21,20 +22,37 @@ async function getBrands() {
   return data || [];
 }
 
-async function getCategories() {
-  const { data } = await supabase
+async function getCategoriesWithImages() {
+  const { data: categories } = await supabase
     .from("categories")
     .select("*")
     .neq("slug", "sem-categoria")
     .order("name");
-  return data || [];
+
+  if (!categories) return [];
+
+  // Get one product image per category
+  const result = await Promise.all(
+    categories.map(async (cat) => {
+      const { data: products } = await supabase
+        .from("products")
+        .select("product_images(src)")
+        .eq("category_id", cat.id)
+        .eq("status", "publish")
+        .limit(1);
+      const image = products?.[0]?.product_images?.[0]?.src || null;
+      return { ...cat, image };
+    })
+  );
+
+  return result;
 }
 
 export default async function Home() {
   const [products, brands, categories] = await Promise.all([
     getFeaturedProducts(),
     getBrands(),
-    getCategories(),
+    getCategoriesWithImages(),
   ]);
 
   return (
@@ -106,26 +124,8 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Categorias */}
-      <section className="py-14">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Categorias</h2>
-            <p className="text-gray-500">Encontre a peça que precisa por categoria</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/loja?categoria=${category.slug}`}
-                className="p-4 bg-white border-2 border-gray-200 rounded-xl text-center text-sm font-medium text-gray-700 hover:bg-primary hover:text-white hover:border-primary hover:scale-105 transition-all shadow-sm"
-              >
-                {category.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Categorias - Carrossel circular */}
+      <CategoryCarousel categories={categories} />
 
       {/* Sobre */}
       <section className="py-14 bg-white">
