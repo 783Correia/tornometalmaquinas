@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { ProductCard } from "@/components/product-card";
+import { HeroCarousel } from "@/components/hero-carousel";
 import { Wrench, Truck, ShieldCheck, Headphones } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -38,37 +39,8 @@ export default async function Home() {
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-primary to-primary-dark overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE4YzEuNjU3IDAgMy0xLjM0MyAzLTNzLTEuMzQzLTMtMy0zLTMgMS4zNDMtMyAzIDEuMzQzIDMgMyAzem0tMjQgMTJjMS42NTcgMCAzLTEuMzQzIDMtM3MtMS4zNDMtMy0zLTMtMyAxLjM0My0zIDMgMS4zNDMgMyAzIDN6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
-        <div className="relative max-w-7xl mx-auto px-4 py-20 md:py-28">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-              Peças para Plantadeiras com{" "}
-              <span className="text-accent">Precisão</span>
-            </h1>
-            <p className="text-lg text-blue-100 mb-8 leading-relaxed">
-              A maior e melhor fábrica de peças para plantadeiras. Semeato,
-              Jumil, John Deere, Massey, Case e mais. Qualidade garantida com
-              envio para todo o Brasil.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/loja"
-                className="bg-white text-primary font-semibold px-7 py-3 rounded-xl hover:bg-blue-50 hover:scale-105 transition-all shadow-lg"
-              >
-                Ver Produtos
-              </Link>
-              <Link
-                href="/contato"
-                className="border-2 border-white/30 text-white px-7 py-3 rounded-xl hover:bg-white/10 transition-all"
-              >
-                Fale Conosco
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero Carousel */}
+      <HeroCarousel />
 
       {/* Diferenciais */}
       <section className="py-14 bg-gray-50">
@@ -165,7 +137,7 @@ export default async function Home() {
             Entre em contato conosco pelo WhatsApp. Fabricamos peças sob medida para a sua plantadeira.
           </p>
           <a
-            href="https://wa.me/5500000000000"
+            href="https://wa.me/555433153969?text=Ol%C3%A1%2C%20vim%20pelo%20site%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white text-primary font-semibold px-8 py-3.5 rounded-xl hover:bg-blue-50 hover:scale-105 transition-all shadow-lg"
