@@ -2,11 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
+import { ShippingCalculator } from "@/components/shipping-calculator";
 
 export default function CarrinhoPage() {
   const { items, updateQuantity, removeItem, totalPrice, clearCart } = useCartStore();
+  const [shippingCost, setShippingCost] = useState(0);
+  const [shippingName, setShippingName] = useState("");
 
   if (items.length === 0) {
     return (
@@ -61,12 +65,38 @@ export default function CarrinhoPage() {
           ))}
         </div>
 
-        <div className="mt-6 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-500">Subtotal</span>
-            <span className="text-2xl font-bold text-gray-900">R$ {totalPrice().toFixed(2)}</span>
+        <div className="mt-6 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
+          <h2 className="font-semibold text-gray-900">Calcular Frete</h2>
+          <ShippingCalculator
+            products={items.map((item) => ({
+              weight: item.weight || 0.3,
+              width: 11,
+              height: 11,
+              length: 16,
+              quantity: item.quantity,
+              price: item.price,
+            }))}
+            onSelect={(opt) => { setShippingCost(opt.price); setShippingName(`${opt.company} - ${opt.name}`); }}
+          />
+        </div>
+
+        <div className="mt-4 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500">Subtotal</span>
+              <span className="text-gray-900">R$ {totalPrice().toFixed(2).replace(".", ",")}</span>
+            </div>
+            {shippingCost > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Frete ({shippingName})</span>
+                <span className="text-gray-900">R$ {shippingCost.toFixed(2).replace(".", ",")}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+              <span className="font-semibold text-gray-900">Total</span>
+              <span className="text-2xl font-bold text-primary">R$ {(totalPrice() + shippingCost).toFixed(2).replace(".", ",")}</span>
+            </div>
           </div>
-          <p className="text-xs text-gray-400 mb-4">Frete calculado no checkout.</p>
           <Link href="/login" className="block w-full bg-primary text-white text-center font-semibold py-3.5 rounded-xl hover:bg-primary-dark transition mb-3">
             Finalizar Compra
           </Link>
