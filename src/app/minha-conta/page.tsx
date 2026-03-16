@@ -35,6 +35,7 @@ export default function MinhaContaPage() {
     setSaving(true); setMessage("");
     const { error } = await supabase.from("customers").update({
       full_name: customer.full_name, phone: customer.phone, cpf: customer.cpf,
+      cnpj: customer.cnpj, inscricao_estadual: customer.inscricao_estadual,
       address_street: customer.address_street, address_number: customer.address_number,
       address_complement: customer.address_complement, address_neighborhood: customer.address_neighborhood,
       address_city: customer.address_city, address_state: customer.address_state, address_zip: customer.address_zip,
@@ -111,6 +112,16 @@ export default function MinhaContaPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">CPF</label>
                   <input type="text" value={customer.cpf || ""} onChange={(e) => update("cpf", e.target.value)} className={inputClass} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">CNPJ</label>
+                  <input type="text" value={customer.cnpj || ""} onChange={(e) => update("cnpj", e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Inscrição Estadual</label>
+                  <input type="text" value={customer.inscricao_estadual || ""} onChange={(e) => update("inscricao_estadual", e.target.value)} className={inputClass} />
                 </div>
               </div>
               <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-primary-dark transition disabled:opacity-50">

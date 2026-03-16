@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { UserPlus, Eye, EyeOff } from "lucide-react";
 
 export default function CadastroPage() {
-  const [form, setForm] = useState({ full_name: "", email: "", phone: "", cpf: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ full_name: "", email: "", phone: "", cpf: "", cnpj: "", inscricao_estadual: "", password: "", confirmPassword: "" });
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,11 @@ export default function CadastroPage() {
   function formatCPF(value: string) {
     const d = value.replace(/\D/g, "").slice(0, 11);
     return d.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  }
+
+  function formatCNPJ(value: string) {
+    const d = value.replace(/\D/g, "").slice(0, 14);
+    return d.replace(/(\d{2})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1/$2").replace(/(\d{4})(\d{1,2})$/, "$1-$2");
   }
 
   function formatPhone(value: string) {
@@ -39,6 +44,7 @@ export default function CadastroPage() {
     await supabase.from("customers").insert({
       id: authData.user.id, full_name: form.full_name, email: form.email,
       phone: form.phone.replace(/\D/g, ""), cpf: form.cpf.replace(/\D/g, ""),
+      cnpj: form.cnpj.replace(/\D/g, "") || null, inscricao_estadual: form.inscricao_estadual || null,
     });
 
     router.push("/minha-conta");
@@ -77,6 +83,18 @@ export default function CadastroPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1.5">CPF</label>
               <input type="text" value={form.cpf} onChange={(e) => update("cpf", formatCPF(e.target.value))}
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="000.000.000-00" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">CNPJ *</label>
+              <input type="text" value={form.cnpj} onChange={(e) => update("cnpj", formatCNPJ(e.target.value))}
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="00.000.000/0000-00" required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Inscrição Estadual</label>
+              <input type="text" value={form.inscricao_estadual} onChange={(e) => update("inscricao_estadual", e.target.value)}
+                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="Inscrição estadual" />
             </div>
           </div>
           <div>

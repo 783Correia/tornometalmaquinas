@@ -63,6 +63,8 @@ export type Customer = {
   email: string
   phone: string | null
   cpf: string | null
+  cnpj: string | null
+  inscricao_estadual: string | null
   address_street: string | null
   address_number: string | null
   address_complement: string | null
