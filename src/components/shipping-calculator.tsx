@@ -56,7 +56,10 @@ export function ShippingCalculator({ products, onSelect }: Props) {
       const data = await res.json();
 
       if (data.error) { setError(data.error); }
-      else if (data.options?.length === 0) { setError("Nenhuma opção de frete disponível para este CEP."); }
+      else if (data.options?.length === 0) {
+        const debugMsg = data.debug ? JSON.stringify(data.debug[0]?.error || data.debug, null, 2) : "";
+        setError(`Nenhuma opção de frete disponível. ${debugMsg}`);
+      }
       else { setOptions(data.options); }
     } catch {
       setError("Erro ao calcular frete.");

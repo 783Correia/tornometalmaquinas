@@ -42,7 +42,13 @@ export async function POST(req: NextRequest) {
 
     const data = await res.json();
 
-    const options = (Array.isArray(data) ? data : [])
+    // Debug: return raw response if no valid options
+    const allOptions = Array.isArray(data) ? data : [];
+    if (allOptions.length === 0 || allOptions.every((s: { error?: string }) => s.error)) {
+      return NextResponse.json({ options: [], debug: data });
+    }
+
+    const options = allOptions
       .filter((s: { error?: string }) => !s.error)
       .map((s: { id: number; name: string; company: { name: string; picture: string }; price: string; discount: string; delivery_time: number; custom_price: string }) => ({
         id: s.id,
