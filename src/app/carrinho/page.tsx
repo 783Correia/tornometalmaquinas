@@ -70,9 +70,9 @@ export default function CarrinhoPage() {
           <ShippingCalculator
             products={items.map((item) => ({
               weight: item.weight || 0.3,
-              width: 11,
-              height: 11,
-              length: 16,
+              width: item.width || 11,
+              height: item.height || 11,
+              length: item.length || 16,
               quantity: item.quantity,
               price: item.price,
             }))}

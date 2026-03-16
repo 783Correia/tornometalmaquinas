@@ -24,14 +24,19 @@ export async function POST(req: NextRequest) {
       if (weight > 29) weight = 29;
       if (weight < 0.1) weight = 0.1;
 
+      // Dimensions: min 1cm, max 100cm, default 11cm. If 0 use default.
+      const width = Math.max(Math.min(p.width || 11, 60), 1);
+      const height = Math.max(Math.min(p.height || 11, 60), 1);
+      const length = Math.max(Math.min(p.length || 16, 60), 1);
+
       return {
         id: String(i + 1),
-        width: Math.min(p.width || 11, 100),
-        height: Math.min(p.height || 11, 100),
-        length: Math.min(p.length || 16, 100),
+        width,
+        height,
+        length,
         weight,
         insurance_value: p.price || 0,
-        quantity: Math.min(p.quantity || 1, 10),
+        quantity: p.quantity || 1,
       };
     }),
   };

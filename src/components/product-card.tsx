@@ -20,6 +20,9 @@ export function ProductCard({ product }: { product: Product }) {
       image: image?.src || "",
       sku: product.sku,
       weight: product.weight,
+      length: product.length,
+      width: product.width,
+      height: product.height,
     });
   }
 

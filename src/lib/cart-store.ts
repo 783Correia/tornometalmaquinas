@@ -10,6 +10,9 @@ export type CartItem = {
   quantity: number
   sku: string
   weight: number
+  length: number
+  width: number
+  height: number
 }
 
 type CartStore = {

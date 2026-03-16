@@ -27,6 +27,9 @@ export function ProductDetail({ product, related }: { product: Product; related:
         image: images[0]?.src || "",
         sku: product.sku,
         weight: product.weight,
+        length: product.length,
+        width: product.width,
+        height: product.height,
       });
     }
     setAdded(true);
