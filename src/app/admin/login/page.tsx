@@ -20,8 +20,8 @@ export default function AdminLoginPage() {
     const { data, error: authErr } = await supabase.auth.signInWithPassword({ email, password });
     if (authErr || !data.user) { setError("Credenciais inválidas."); setLoading(false); return; }
 
-    const { data: admin, error: adminErr } = await supabase.from("admins").select("id").eq("id", data.user.id).single();
-    if (!admin) { setError(`Sem permissão. User: ${data.user.id} | Erro: ${adminErr?.message || "admin null"}`); await supabase.auth.signOut(); setLoading(false); return; }
+    const { data: admin } = await supabase.from("admins").select("id").eq("id", data.user.id).single();
+    if (!admin) { setError("Você não tem permissão de administrador."); await supabase.auth.signOut(); setLoading(false); return; }
 
     router.push("/admin");
   }
