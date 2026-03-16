@@ -32,160 +32,169 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm">
-      {/* Top bar */}
-      <div className="bg-primary text-white text-xs font-medium text-center py-1.5 px-4">
-        Peças para Plantadeiras com entrega para todo o Brasil
-      </div>
-
+    <header className="sticky top-0 z-50 bg-[#0d1b3e]">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Main header */}
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center justify-between h-[70px] gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <span className="text-white font-black text-sm">TM</span>
+          <Link href="/" className="flex items-center gap-3 shrink-0">
+            <div className="w-12 h-12 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center">
+              <span className="text-white font-black text-xs">TM</span>
             </div>
             <div className="hidden sm:block">
-              <span className="text-lg font-bold text-gray-900">TornoMetal</span>
-              <span className="text-xs text-gray-500 block -mt-1">Everton Lopes</span>
+              <span className="text-white font-bold text-lg tracking-wide">
+                TORNOMETAL
+              </span>
+              <span className="text-[10px] text-blue-300/60 block -mt-0.5 tracking-wider">
+                Everton Lopes
+              </span>
             </div>
           </Link>
+
+          {/* Nav links - Desktop */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {[
+              { href: "/", label: "HOME" },
+              { href: "/loja", label: "TODOS OS PRODUTOS" },
+              { href: "/contato", label: "CONTATO" },
+            ].map((link, i) => (
+              <div key={link.href} className="flex items-center">
+                {i > 0 && (
+                  <span className="text-blue-400/30 mx-2">|</span>
+                )}
+                <Link
+                  href={link.href}
+                  className="text-sm font-medium text-white/80 hover:text-white tracking-wide transition"
+                >
+                  {link.label}
+                </Link>
+              </div>
+            ))}
+          </nav>
 
           {/* Search - Desktop */}
           <form
             onSubmit={handleSearch}
-            className="hidden md:flex items-center flex-1 max-w-xl"
+            className="hidden md:flex items-center flex-1 max-w-sm"
           >
-            <div className="flex w-full border-2 border-gray-200 rounded-xl overflow-hidden focus-within:border-primary transition">
+            <div className="flex w-full bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="flex items-center pl-3 text-gray-400">
+                <Search size={18} />
+              </div>
               <input
                 type="text"
-                placeholder="Buscar peças por nome, SKU ou marca..."
+                placeholder="Pesquisar produtos..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="px-4 py-2.5 w-full text-sm outline-none placeholder-gray-400"
+                className="px-3 py-2.5 w-full text-sm outline-none text-gray-700 placeholder-gray-400"
               />
-              <button
-                type="submit"
-                className="px-5 bg-primary text-white hover:bg-primary-dark transition"
-              >
-                <Search size={18} />
-              </button>
             </div>
           </form>
 
-          {/* Right side */}
-          <div className="flex items-center gap-2">
-            {user ? (
-              <Link
-                href="/minha-conta"
-                className="hidden md:flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition px-3 py-2 rounded-lg hover:bg-gray-50"
-              >
-                <User size={18} />
-                <span>Minha Conta</span>
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="hidden md:flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition px-3 py-2 rounded-lg hover:bg-gray-50"
-              >
-                <LogIn size={18} />
-                <span>Entrar</span>
-              </Link>
-            )}
+          {/* Right side - Auth + Cart */}
+          <div className="hidden md:flex items-center gap-5">
+            {/* Auth */}
+            <div className="text-right">
+              {user ? (
+                <Link href="/minha-conta" className="group">
+                  <span className="text-[11px] text-blue-300/50 block">
+                    Bem-vindo
+                  </span>
+                  <span className="text-sm font-bold text-primary-light hover:text-white transition">
+                    Minha Conta
+                  </span>
+                </Link>
+              ) : (
+                <Link href="/login" className="group">
+                  <span className="text-[11px] text-blue-300/50 block">
+                    Entrar / Cadastrar
+                  </span>
+                  <span className="text-sm font-bold text-primary-light hover:text-white transition">
+                    Minha Conta
+                  </span>
+                </Link>
+              )}
+            </div>
 
+            {/* Cart */}
             <Link
               href="/carrinho"
-              className="relative p-2.5 text-gray-600 hover:text-primary transition rounded-lg hover:bg-gray-50"
+              className="relative text-white/80 hover:text-white transition"
             >
+              <ShoppingCart size={26} />
+              <span className="absolute -top-2 -right-2 bg-primary-light text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                {totalItems}
+              </span>
+            </Link>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="flex md:hidden items-center gap-3">
+            <Link href="/carrinho" className="relative text-white/80">
               <ShoppingCart size={22} />
               {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                <span className="absolute -top-2 -right-2 bg-primary-light text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                   {totalItems}
                 </span>
               )}
             </Link>
-
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 text-gray-600"
+              className="p-1.5 text-white/80"
             >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
-
-        {/* Nav - Desktop */}
-        <nav className="hidden md:flex items-center gap-1 pb-2 -mx-2">
-          {[
-            { href: "/", label: "Início" },
-            { href: "/loja", label: "Todos os Produtos" },
-            { href: "/loja?categoria=condutor", label: "Condutores" },
-            { href: "/loja?categoria=telescopio", label: "Telescópios" },
-            { href: "/loja?categoria=bocal", label: "Bocais" },
-            { href: "/loja?categoria=revestimento", label: "Revestimentos" },
-            { href: "/contato", label: "Contato" },
-          ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm text-gray-600 hover:text-primary hover:bg-blue-50 px-3 py-1.5 rounded-lg transition"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
       </div>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t px-4 pb-4 shadow-lg">
+        <div className="md:hidden bg-[#0d1b3e] border-t border-white/10 px-4 pb-4">
           <form onSubmit={handleSearch} className="flex mt-3 mb-4">
-            <input
-              type="text"
-              placeholder="Buscar peças..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border-2 border-gray-200 px-4 py-2.5 w-full text-sm rounded-l-xl outline-none focus:border-primary"
-            />
-            <button type="submit" className="bg-primary px-4 rounded-r-xl text-white">
-              <Search size={18} />
-            </button>
+            <div className="flex w-full bg-white rounded-lg overflow-hidden">
+              <div className="flex items-center pl-3 text-gray-400">
+                <Search size={16} />
+              </div>
+              <input
+                type="text"
+                placeholder="Pesquisar produtos..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="px-3 py-2.5 w-full text-sm outline-none"
+              />
+            </div>
           </form>
           {[
-            { href: "/", label: "Início" },
+            { href: "/", label: "Home" },
             { href: "/loja", label: "Todos os Produtos" },
-            { href: "/loja?categoria=condutor", label: "Condutores" },
-            { href: "/loja?categoria=telescopio", label: "Telescópios" },
-            { href: "/loja?categoria=bocal", label: "Bocais" },
             { href: "/contato", label: "Contato" },
           ].map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="block py-2.5 text-gray-700 hover:text-primary border-b border-gray-100"
+              className="block py-2.5 text-white/70 hover:text-white border-b border-white/5 text-sm"
             >
               {link.label}
             </Link>
           ))}
-          <div className="mt-3 flex gap-3">
+          <div className="mt-3">
             {user ? (
               <Link href="/minha-conta" onClick={() => setMenuOpen(false)}
-                className="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-primary py-2.5 rounded-xl text-sm font-medium">
+                className="flex items-center gap-2 text-primary-light text-sm font-medium py-2">
                 <User size={16} /> Minha Conta
               </Link>
             ) : (
-              <>
+              <div className="flex gap-3">
                 <Link href="/login" onClick={() => setMenuOpen(false)}
-                  className="flex-1 flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 py-2.5 rounded-xl text-sm">
-                  <LogIn size={16} /> Entrar
+                  className="flex-1 text-center border border-white/20 text-white py-2.5 rounded-lg text-sm">
+                  Entrar
                 </Link>
                 <Link href="/cadastro" onClick={() => setMenuOpen(false)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-primary text-white py-2.5 rounded-xl text-sm font-semibold">
+                  className="flex-1 text-center bg-primary-light text-white py-2.5 rounded-lg text-sm font-semibold">
                   Cadastrar
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>
