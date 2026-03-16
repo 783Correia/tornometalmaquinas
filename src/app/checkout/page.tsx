@@ -151,6 +151,26 @@ export default function CheckoutPage() {
       const { data: { user } } = await supabase.auth.getUser();
       const { data: profile } = await supabase.from("customers").select("full_name, email").eq("id", userId).single();
 
+      // Send order confirmation email
+      const fullAddress = `${address.address_street}, ${address.address_number}${address.address_complement ? ` - ${address.address_complement}` : ""} - ${address.address_neighborhood ? `${address.address_neighborhood}, ` : ""}${address.address_city}/${address.address_state} - CEP ${address.address_zip}`;
+      fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "order_confirmation",
+          data: {
+            orderId: order.id,
+            customerName: profile?.full_name || "",
+            customerEmail: profile?.email || user?.email || "",
+            items: items.map((item) => ({ product_name: item.name, quantity: item.quantity, price: item.price })),
+            total: totalPrice() + shipping.price,
+            shippingCost: shipping.price,
+            shippingMethod: `${shipping.company} - ${shipping.name}`,
+            address: fullAddress,
+          },
+        }),
+      }).catch(() => {}); // Fire and forget
+
       // Create Mercado Pago preference
       try {
         const mpRes = await fetch("/api/payment", {

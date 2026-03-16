@@ -14,6 +14,7 @@ type Order = {
   tracking_code: string | null;
   notes: string | null;
   created_at: string;
+  payment_status?: string;
   customers?: { full_name: string; email: string };
   order_items?: { id: number; product_name: string; quantity: number; price: number }[];
 };
@@ -48,6 +49,31 @@ export default function AdminPedidos() {
 
   async function updateTracking(id: number, code: string) {
     await supabase.from("orders").update({ tracking_code: code }).eq("id", id);
+
+    // Send shipping email if tracking code was added
+    if (code) {
+      const order = items.find((o) => o.id === id);
+      if (order?.customers) {
+        fetch("/api/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "shipping",
+            data: {
+              orderId: id,
+              customerName: order.customers.full_name,
+              customerEmail: order.customers.email,
+              items: order.order_items?.map((i) => ({ product_name: i.product_name, quantity: i.quantity, price: i.price })) || [],
+              total: order.total,
+              shippingCost: order.shipping_cost,
+              trackingCode: code,
+              shippingMethod: order.notes?.replace("Frete: ", "") || "",
+            },
+          }),
+        }).catch(() => {});
+      }
+    }
+
     load();
   }
 

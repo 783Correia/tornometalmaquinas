@@ -1,0 +1,31 @@
+import { NextRequest, NextResponse } from "next/server";
+import { sendOrderConfirmation, sendAdminNewOrder, sendPaymentApproved, sendShippingNotification } from "@/lib/email/resend";
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { type, data } = body;
+
+    switch (type) {
+      case "order_confirmation":
+        await Promise.all([
+          sendOrderConfirmation(data),
+          sendAdminNewOrder(data),
+        ]);
+        break;
+      case "payment_approved":
+        await sendPaymentApproved(data);
+        break;
+      case "shipping":
+        await sendShippingNotification(data);
+        break;
+      default:
+        return NextResponse.json({ error: "Invalid email type" }, { status: 400 });
+    }
+
+    return NextResponse.json({ sent: true });
+  } catch (err) {
+    console.error("Email API error:", err);
+    return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+  }
+}

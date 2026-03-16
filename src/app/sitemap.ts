@@ -6,7 +6,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient(supabaseUrl, supabaseKey);
-  const baseUrl = "https://tornometalmaquinas.vercel.app";
+  const baseUrl = "https://tornometalevertonlopes.com.br";
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

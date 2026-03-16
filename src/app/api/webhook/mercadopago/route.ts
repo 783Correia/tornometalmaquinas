@@ -61,11 +61,11 @@ export async function POST(req: NextRequest) {
           status,
         }).eq("id", orderId);
 
-        // Decrement stock on payment approval
+        // On payment approval: decrement stock + send email
         if (paymentData.status === "approved") {
           const { data: orderItems } = await supabase
             .from("order_items")
-            .select("product_id, quantity")
+            .select("product_id, product_name, quantity, price")
             .eq("order_id", orderId);
 
           if (orderItems) {
@@ -75,6 +75,25 @@ export async function POST(req: NextRequest) {
                 p_quantity: item.quantity,
               });
             }
+          }
+
+          // Get order + customer info for email
+          const { data: order } = await supabase
+            .from("orders")
+            .select("*, customers(full_name, email)")
+            .eq("id", orderId)
+            .single();
+
+          if (order?.customers) {
+            const { sendPaymentApproved } = await import("@/lib/email/resend");
+            await sendPaymentApproved({
+              orderId,
+              customerName: order.customers.full_name,
+              customerEmail: order.customers.email,
+              items: orderItems || [],
+              total: order.total,
+              shippingCost: order.shipping_cost,
+            });
           }
         }
       }

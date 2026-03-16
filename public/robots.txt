@@ -7,4 +7,4 @@ Disallow: /checkout
 Disallow: /minha-conta
 Disallow: /pagamento/
 
-Sitemap: https://tornometalmaquinas.vercel.app/sitemap.xml
+Sitemap: https://tornometalevertonlopes.com.br/sitemap.xml
