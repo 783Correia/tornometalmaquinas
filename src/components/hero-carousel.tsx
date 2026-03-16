@@ -25,7 +25,7 @@ const slides = [
     description: "Peças fabricadas com os melhores materiais para máxima resistência",
     cta: "Conhecer Peças",
     href: "/loja",
-    textPosition: "left-box" as const,
+    textPosition: "left-inset" as const,
     theme: "light" as const, // light bg = dark text
   },
   {
@@ -36,7 +36,7 @@ const slides = [
     description: "Compatível com Semeato, Jumil, Imasa, Tatu e mais marcas",
     cta: "Ver Marcas",
     href: "/loja",
-    textPosition: "right-box" as const,
+    textPosition: "right-center" as const,
     theme: "light" as const,
   },
   {
@@ -47,7 +47,7 @@ const slides = [
     description: "Tecnologia de ponta na fabricação de peças agrícolas de reposição",
     cta: "Comprar Agora",
     href: "/loja",
-    textPosition: "left" as const,
+    textPosition: "center" as const,
     theme: "dark" as const,
   },
 ];
@@ -90,27 +90,37 @@ export function HeroCarousel() {
 
               {/* Overlay only for dark theme slides */}
               {!isLight(slide.theme) && (
-                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+                <div className={`absolute inset-0 ${
+                  slide.textPosition === "center"
+                    ? "bg-black/50"
+                    : "bg-gradient-to-r from-black/60 via-black/30 to-transparent"
+                }`} />
               )}
 
               {/* Text content */}
               <div
                 className={`absolute inset-0 flex items-center ${
-                  slide.textPosition === "right-box"
-                    ? "justify-end"
-                    : "justify-start"
+                  slide.textPosition === "center"
+                    ? "justify-center"
+                    : slide.textPosition === "right-center"
+                      ? "justify-end"
+                      : "justify-start"
                 }`}
               >
                 <div
-                  className={`px-6 sm:px-10 md:px-16 lg:px-20 w-full max-w-7xl mx-auto flex ${
-                    slide.textPosition === "right-box"
-                      ? "justify-end"
-                      : "justify-start"
+                  className={`w-full max-w-7xl mx-auto flex ${
+                    slide.textPosition === "center"
+                      ? "justify-center px-6"
+                      : slide.textPosition === "right-center"
+                        ? "justify-end px-6 sm:px-10 md:px-16 lg:pr-[12%]"
+                        : slide.textPosition === "left-inset"
+                          ? "justify-start px-10 sm:px-14 md:px-24 lg:px-32"
+                          : "justify-start px-6 sm:px-10 md:px-16 lg:px-20"
                   }`}
                 >
                   <div
                     className={`max-w-[260px] sm:max-w-xs md:max-w-md lg:max-w-lg ${
-                      slide.textPosition === "right-box" ? "text-right" : ""
+                      slide.textPosition === "center" ? "text-center" : ""
                     }`}
                   >
                     <h2
@@ -125,9 +135,9 @@ export function HeroCarousel() {
                       </span>
                     </h2>
                     <p
-                      className={`mt-1.5 sm:mt-2 md:mt-3 text-[11px] sm:text-xs md:text-sm lg:text-base ${
+                      className={`mt-1.5 sm:mt-2 md:mt-3 text-[11px] sm:text-xs md:text-sm lg:text-base max-w-sm ${
                         isLight(slide.theme) ? "text-gray-600" : "text-gray-200 drop-shadow-md"
-                      } ${slide.textPosition === "right-box" ? "ml-auto" : ""} max-w-sm`}
+                      } ${slide.textPosition === "center" ? "mx-auto" : ""}`}
                     >
                       {slide.description}
                     </p>
