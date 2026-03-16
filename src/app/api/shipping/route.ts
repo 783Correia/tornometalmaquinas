@@ -14,31 +14,56 @@ export async function POST(req: NextRequest) {
 
   const cleanCep = to_cep.replace(/\D/g, "");
 
+  // Consolidar todos os produtos em um único pacote
+  let totalWeight = 0;
+  let totalInsurance = 0;
+  let maxWidth = 0;
+  let maxLength = 0;
+  let totalHeight = 0;
+
+  for (const p of products as { weight: number; width: number; height: number; length: number; quantity: number; price: number }[]) {
+    const qty = p.quantity || 1;
+
+    // Peso: converter de gramas se necessário
+    let weight = p.weight || 0.3;
+    if (weight > 100) weight = weight / 1000;
+    if (weight < 0.1) weight = 0.1;
+    totalWeight += weight * qty;
+
+    // Dimensões do produto (com defaults)
+    const width = Math.max(Math.min(p.width || 11, 60), 1);
+    const height = Math.max(Math.min(p.height || 11, 60), 1);
+    const length = Math.max(Math.min(p.length || 16, 60), 1);
+
+    // Maior largura e comprimento definem a base do pacote
+    maxWidth = Math.max(maxWidth, width);
+    maxLength = Math.max(maxLength, length);
+    // Alturas se somam (empilhados)
+    totalHeight += height * qty;
+
+    totalInsurance += (p.price || 0) * qty;
+  }
+
+  // Limites do Melhor Envio: max 150cm por dimensão, max 30kg
+  const packageWidth = Math.min(maxWidth, 150);
+  const packageLength = Math.min(maxLength, 150);
+  const packageHeight = Math.min(Math.max(totalHeight, 1), 150);
+  const packageWeight = Math.min(Math.max(totalWeight, 0.1), 30);
+
   const payload = {
     from: { postal_code: FROM_CEP },
     to: { postal_code: cleanCep },
-    products: products.map((p: { weight: number; width: number; height: number; length: number; quantity: number; price: number }, i: number) => {
-      // Ensure weight is reasonable (max 29kg per item, min 0.1kg)
-      let weight = p.weight || 0.3;
-      if (weight > 100) weight = weight / 1000; // probably in grams, convert to kg
-      if (weight > 29) weight = 29;
-      if (weight < 0.1) weight = 0.1;
-
-      // Dimensions: min 1cm, max 100cm, default 11cm. If 0 use default.
-      const width = Math.max(Math.min(p.width || 11, 60), 1);
-      const height = Math.max(Math.min(p.height || 11, 60), 1);
-      const length = Math.max(Math.min(p.length || 16, 60), 1);
-
-      return {
-        id: String(i + 1),
-        width,
-        height,
-        length,
-        weight,
-        insurance_value: p.price || 0,
-        quantity: p.quantity || 1,
-      };
-    }),
+    products: [
+      {
+        id: "1",
+        width: packageWidth,
+        height: packageHeight,
+        length: packageLength,
+        weight: packageWeight,
+        insurance_value: totalInsurance,
+        quantity: 1,
+      },
+    ],
   };
 
   try {
