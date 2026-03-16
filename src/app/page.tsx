@@ -127,6 +127,30 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Sobre */}
+      <section className="py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Sobre a TornoMetal</h2>
+          <div className="space-y-5 text-gray-600 leading-relaxed">
+            <p>
+              <strong className="text-gray-900">Tornometal (Everton Lopes): Tradição e Qualidade em Peças Agrícolas</strong>
+            </p>
+            <p>
+              Com mais de 25 anos de história, a <strong>Tornometal</strong> é uma empresa familiar localizada em Passo Fundo, no Rio Grande do Sul, reconhecida pela excelência na fabricação de peças agrícolas de reposição para plantadeiras. Ao longo de sua trajetória, construiu uma reputação sólida baseada na qualidade de seus produtos, no atendimento dedicado e no compromisso com a satisfação de cada cliente.
+            </p>
+            <p>
+              No mercado agrícola, onde confiança e durabilidade são essenciais, a Tornometal se destaca por oferecer soluções robustas e eficientes que atendem produtores rurais e revendas em todo o Brasil. Cada peça é desenvolvida com rigor técnico, garantindo alto desempenho, resistência e compatibilidade para diferentes modelos de equipamentos.
+            </p>
+            <p>
+              Mais do que entregar produtos, a empresa valoriza o relacionamento com seus clientes. Guiada pelos princípios da família <strong>Everton Lopes</strong>, a Tornometal mantém um atendimento próximo, profissional e sempre voltado a entender as necessidades reais do campo.
+            </p>
+            <p>
+              A Tornometal é a sua parceira confiável em peças agrícolas de reposição, tradição, experiência e qualidade que fazem a diferença na produtividade do seu negócio.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-14 bg-primary">
         <div className="max-w-3xl mx-auto px-4 text-center">
