@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const MELHOR_ENVIO_URL = "https://melhorenvio.com.br/api/v2/me/shipment/calculate";
 const TOKEN = process.env.MELHOR_ENVIO_TOKEN!;
-const FROM_CEP = process.env.MELHOR_ENVIO_FROM_CEP || "99010100";
+const FROM_CEP = process.env.MELHOR_ENVIO_FROM_CEP || "99070250";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
