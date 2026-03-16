@@ -14,12 +14,11 @@ export async function POST(req: NextRequest) {
 
   const cleanCep = to_cep.replace(/\D/g, "");
 
-  // Consolidar todos os produtos em um único pacote
+  // Consolidar todos os produtos em um único pacote realista
   let totalWeight = 0;
   let totalInsurance = 0;
-  let maxWidth = 0;
-  let maxLength = 0;
-  let totalHeight = 0;
+  let totalVolume = 0;
+  let maxDimension = 0;
 
   for (const p of products as { weight: number; width: number; height: number; length: number; quantity: number; price: number }[]) {
     const qty = p.quantity || 1;
@@ -30,25 +29,30 @@ export async function POST(req: NextRequest) {
     if (weight < 0.1) weight = 0.1;
     totalWeight += weight * qty;
 
-    // Dimensões do produto (com defaults)
-    const width = Math.max(Math.min(p.width || 11, 60), 1);
-    const height = Math.max(Math.min(p.height || 11, 60), 1);
-    const length = Math.max(Math.min(p.length || 16, 60), 1);
+    // Dimensões do produto (defaults pequenos para peças de torno)
+    const width = Math.max(Math.min(p.width || 8, 60), 1);
+    const height = Math.max(Math.min(p.height || 8, 60), 1);
+    const length = Math.max(Math.min(p.length || 10, 60), 1);
 
-    // Maior largura e comprimento definem a base do pacote
-    maxWidth = Math.max(maxWidth, width);
-    maxLength = Math.max(maxLength, length);
-    // Alturas se somam (empilhados)
-    totalHeight += height * qty;
+    // Volume total de todos os itens
+    totalVolume += width * height * length * qty;
+    maxDimension = Math.max(maxDimension, width, height, length);
 
     totalInsurance += (p.price || 0) * qty;
   }
 
-  // Limites do Melhor Envio: max 150cm por dimensão, max 30kg
-  const packageWidth = Math.min(maxWidth, 150);
-  const packageLength = Math.min(maxLength, 150);
-  const packageHeight = Math.min(Math.max(totalHeight, 1), 150);
-  const packageWeight = Math.min(Math.max(totalWeight, 0.1), 30);
+  // Calcular dimensões realistas da caixa a partir do volume total
+  // Raiz cúbica do volume dá dimensões proporcionais de uma caixa cúbica
+  // Adicionar 20% de margem para acomodação e proteção
+  const cubeRoot = Math.cbrt(totalVolume * 1.2);
+  // A menor dimensão da caixa não pode ser menor que a maior peça individual
+  const baseDim = Math.max(Math.ceil(cubeRoot), maxDimension);
+
+  // Distribuir: caixa levemente retangular (mais natural)
+  const packageWidth = Math.min(Math.max(baseDim, 11), 100);
+  const packageLength = Math.min(Math.max(baseDim, 11), 100);
+  const packageHeight = Math.min(Math.max(Math.ceil(totalVolume * 1.2 / (packageWidth * packageLength)), 5), 100);
+  const packageWeight = Math.min(Math.max(totalWeight, 0.3), 30);
 
   const payload = {
     from: { postal_code: FROM_CEP },
