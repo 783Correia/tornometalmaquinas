@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "tornometalevertonlopes.com.br",
       },
+      {
+        protocol: "https",
+        hostname: "lozduuvplbfiduaigjth.supabase.co",
+      },
     ],
   },
 };
