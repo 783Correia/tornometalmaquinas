@@ -34,13 +34,13 @@ export async function POST(req: NextRequest) {
           name: payer.name,
         } : undefined,
         back_urls: {
-          success: `${process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalmaquinas.vercel.app"}/pagamento/sucesso?order=${orderId}`,
-          failure: `${process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalmaquinas.vercel.app"}/pagamento/falha?order=${orderId}`,
-          pending: `${process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalmaquinas.vercel.app"}/pagamento/pendente?order=${orderId}`,
+          success: `${process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br"}/pagamento/sucesso?order=${orderId}`,
+          failure: `${process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br"}/pagamento/falha?order=${orderId}`,
+          pending: `${process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br"}/pagamento/pendente?order=${orderId}`,
         },
         auto_return: "approved",
         external_reference: String(orderId),
-        notification_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalmaquinas.vercel.app"}/api/webhook/mercadopago`,
+        notification_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br"}/api/webhook/mercadopago`,
       },
     });
 

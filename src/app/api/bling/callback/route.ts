@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   const clientId = process.env.BLING_CLIENT_ID!;
   const clientSecret = process.env.BLING_CLIENT_SECRET!;
-  const redirectUri = "https://tornometalmaquinas.vercel.app/api/bling/callback";
+  const redirectUri = "https://tornometalevertonlopes.com.br/api/bling/callback";
 
   // Exchange code for tokens
   const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
@@ -55,5 +55,5 @@ export async function GET(req: NextRequest) {
   }, { onConflict: "key" });
 
   // Redirect to admin
-  return NextResponse.redirect("https://tornometalmaquinas.vercel.app/admin?bling=connected");
+  return NextResponse.redirect("https://tornometalevertonlopes.com.br/admin?bling=connected");
 }

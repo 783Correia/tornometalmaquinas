@@ -10,10 +10,51 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br";
+
 export const metadata: Metadata = {
-  title: "TornoMetal Everton Lopes | Peças para Plantadeiras",
+  title: {
+    default: "TornoMetal Everton Lopes | Peças para Plantadeiras",
+    template: "%s | TornoMetal",
+  },
   description:
-    "A maior e melhor fábrica de peças para plantadeiras. Semeato, Jumil, John Deere, Massey e mais.",
+    "Fábrica de peças para plantadeiras em Passo Fundo/RS. Peças de reposição para Semeato, Jumil, John Deere, Massey, Imasa e mais. Envio para todo o Brasil.",
+  keywords: [
+    "peças para plantadeiras",
+    "peças agrícolas",
+    "peças de reposição",
+    "Semeato",
+    "Jumil",
+    "Imasa",
+    "Tatu Marchesan",
+    "TornoMetal",
+    "Passo Fundo",
+    "condutor de sementes",
+    "dosador",
+    "telescópio",
+  ],
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    title: "TornoMetal Everton Lopes | Peças para Plantadeiras",
+    description:
+      "Fábrica de peças para plantadeiras em Passo Fundo/RS. Mais de 25 anos de tradição e qualidade.",
+    url: SITE_URL,
+    siteName: "TornoMetal Everton Lopes",
+    locale: "pt_BR",
+    type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "TornoMetal Everton Lopes",
+      },
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

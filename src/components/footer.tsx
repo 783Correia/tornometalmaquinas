@@ -1,7 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
 
-export function Footer() {
+async function getTopCategories() {
+  const { data } = await supabase
+    .from("categories")
+    .select("name, slug")
+    .neq("slug", "sem-categoria")
+    .order("name")
+    .limit(8);
+  return data || [];
+}
+
+export async function Footer() {
+  const categories = await getTopCategories();
+
   return (
     <footer className="bg-gray-900 text-gray-400">
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -15,8 +28,8 @@ export function Footer() {
               </div>
             </div>
             <p className="text-sm leading-relaxed">
-              A maior e melhor fábrica de peças para plantadeiras. Qualidade e
-              precisão para o agronegócio brasileiro.
+              Fábrica de peças para plantadeiras em Passo Fundo/RS. Qualidade e
+              precisão para o agronegócio brasileiro há mais de 25 anos.
             </p>
           </div>
 
@@ -41,14 +54,7 @@ export function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Categorias</h4>
             <ul className="space-y-2.5 text-sm">
-              {[
-                { slug: "condutor", name: "Condutores" },
-                { slug: "telescopio", name: "Telescópios" },
-                { slug: "bocal", name: "Bocais" },
-                { slug: "revestimento", name: "Revestimentos" },
-                { slug: "base", name: "Bases" },
-                { slug: "dosador", name: "Dosadores" },
-              ].map((cat) => (
+              {categories.map((cat) => (
                 <li key={cat.slug}>
                   <Link href={`/loja?categoria=${cat.slug}`} className="hover:text-primary transition">
                     {cat.name}
@@ -72,7 +78,7 @@ export function Footer() {
 
         <div className="border-t border-gray-800 mt-10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600">
           <p>&copy; {new Date().getFullYear()} TornoMetal Everton Lopes. Todos os direitos reservados.</p>
-          <p>Desenvolvido com tecnologia de ponta</p>
+          <p>Passo Fundo, RS - Brasil</p>
         </div>
       </div>
     </footer>

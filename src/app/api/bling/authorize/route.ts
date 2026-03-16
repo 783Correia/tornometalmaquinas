@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SITE_URL = "https://tornometalmaquinas.vercel.app";
+const SITE_URL = "https://tornometalevertonlopes.com.br";
 
 export async function GET(req: NextRequest) {
   const clientId = process.env.BLING_CLIENT_ID;
