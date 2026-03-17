@@ -34,11 +34,11 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
           <p className="text-sm md:text-base text-gray-500">Encontre a peça que precisa por categoria</p>
         </div>
 
-        <div className="relative">
+        <div className="relative overflow-hidden">
           {/* Left arrow */}
           <button
             onClick={() => scroll("left")}
-            className="absolute -left-1 md:left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 text-primary p-1.5 md:p-2 rounded-full hover:scale-110 transition-all"
+            className="absolute left-1 md:left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 text-primary p-1.5 md:p-2 rounded-full hover:scale-110 transition-all"
             aria-label="Anterior"
           >
             <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
@@ -47,7 +47,7 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
           {/* Scrollable container */}
           <div
             ref={scrollRef}
-            className="flex gap-4 md:gap-8 overflow-x-auto scrollbar-hide px-8 md:px-12 py-2"
+            className="flex gap-4 md:gap-8 overflow-x-auto scrollbar-hide px-12 md:px-16 py-2"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {categories.map((cat) => (
@@ -76,12 +76,14 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
                 </span>
               </Link>
             ))}
+            {/* Spacer to prevent last item from being cut */}
+            <div className="shrink-0 w-4 md:w-8" aria-hidden="true" />
           </div>
 
           {/* Right arrow */}
           <button
             onClick={() => scroll("right")}
-            className="absolute -right-1 md:right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 text-primary p-1.5 md:p-2 rounded-full hover:scale-110 transition-all"
+            className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 text-primary p-1.5 md:p-2 rounded-full hover:scale-110 transition-all"
             aria-label="Próximo"
           >
             <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
