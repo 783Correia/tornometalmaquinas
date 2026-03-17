@@ -32,13 +32,13 @@ export function ProductCard({ product }: { product: Product }) {
       href={`/produto/${product.slug}`}
       className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all"
     >
-      <div className="aspect-square relative bg-gray-50 overflow-hidden">
+      <div className="aspect-square relative bg-gray-50 overflow-hidden p-2">
         {image ? (
           <Image
             src={image.src}
             alt={product.name}
             fill
-            className="object-contain group-hover:scale-105 transition-transform duration-300 p-1"
+            className="object-contain group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (

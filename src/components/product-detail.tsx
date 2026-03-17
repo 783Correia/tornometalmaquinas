@@ -48,9 +48,9 @@ export function ProductDetail({ product, related }: { product: Product; related:
           <div className="grid md:grid-cols-2 gap-8">
             {/* Images */}
             <div>
-              <div className="aspect-square relative bg-white rounded-xl overflow-hidden mb-3 border border-gray-100">
+              <div className="aspect-square relative bg-white rounded-xl overflow-hidden mb-3 border border-gray-100 p-3">
                 {currentImage ? (
-                  <Image src={currentImage.src} alt={product.name} fill className="object-contain p-2" sizes="(max-width: 768px) 100vw, 50vw" priority />
+                  <Image src={currentImage.src} alt={product.name} fill className="object-contain" sizes="(max-width: 768px) 100vw, 50vw" priority />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300">Sem imagem</div>
                 )}
@@ -66,7 +66,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
                       }`}
                       style={{ minWidth: 64, minHeight: 64 }}
                     >
-                      <Image src={img.src} alt="" fill className="object-contain p-0.5" sizes="72px" />
+                      <Image src={img.src} alt="" fill className="object-contain" sizes="72px" />
                     </button>
                   ))}
                 </div>

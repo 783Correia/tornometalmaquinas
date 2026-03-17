@@ -62,7 +62,7 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
                     alt={cat.name}
                     width={112}
                     height={112}
-                    className="object-contain w-full h-full rounded-full p-2"
+                    className="object-contain w-full h-full rounded-full"
                   />
                 ) : (
                   <span className="text-2xl md:text-3xl text-primary/30 font-bold">
