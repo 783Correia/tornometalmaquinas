@@ -93,7 +93,7 @@ export function HeroCarousel() {
                 <div className={`absolute inset-0 ${
                   slide.textPosition === "center"
                     ? "bg-black/50"
-                    : "bg-gradient-to-r from-black/60 via-black/30 to-transparent"
+                    : "bg-gradient-to-r from-black/75 via-black/50 to-black/10"
                 }`} />
               )}
 
