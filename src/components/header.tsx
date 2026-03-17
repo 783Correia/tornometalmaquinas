@@ -61,6 +61,7 @@ export function Header() {
             {[
               { href: "/", label: "HOME" },
               { href: "/loja", label: "TODOS OS PRODUTOS" },
+              { href: "/revenda", label: "REVENDA" },
               { href: "/contato", label: "CONTATO" },
             ].map((link, i) => (
               <div key={link.href} className="flex items-center">
@@ -144,6 +145,7 @@ export function Header() {
           {[
             { href: "/", label: "Home" },
             { href: "/loja", label: "Todos os Produtos" },
+            { href: "/revenda", label: "Revenda" },
             { href: "/contato", label: "Contato" },
           ].map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
