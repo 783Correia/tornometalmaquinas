@@ -61,17 +61,28 @@ export function Header() {
             {[
               { href: "/", label: "HOME" },
               { href: "/loja", label: "TODOS OS PRODUTOS" },
-              { href: "/revenda", label: "REVENDA" },
+              { href: "https://revenda-tornometal.vercel.app/", label: "REVENDA", external: true },
               { href: "/contato", label: "CONTATO" },
             ].map((link, i) => (
               <div key={link.href} className="flex items-center">
                 {i > 0 && <span className="text-blue-400/30 mx-2">|</span>}
-                <Link
-                  href={link.href}
-                  className="text-sm font-medium text-white/80 hover:text-white tracking-wide transition"
-                >
-                  {link.label}
-                </Link>
+                {"external" in link ? (
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-white/80 hover:text-white tracking-wide transition"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    href={link.href}
+                    className="text-sm font-medium text-white/80 hover:text-white tracking-wide transition"
+                  >
+                    {link.label}
+                  </Link>
+                )}
               </div>
             ))}
           </nav>
@@ -145,13 +156,21 @@ export function Header() {
           {[
             { href: "/", label: "Home" },
             { href: "/loja", label: "Todos os Produtos" },
-            { href: "/revenda", label: "Revenda" },
+            { href: "https://revenda-tornometal.vercel.app/", label: "Revenda", external: true },
             { href: "/contato", label: "Contato" },
           ].map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
-              className="block py-2.5 text-white/70 hover:text-white border-b border-white/5 text-sm">
-              {link.label}
-            </Link>
+            "external" in link ? (
+              <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer"
+                onClick={() => setMenuOpen(false)}
+                className="block py-2.5 text-white/70 hover:text-white border-b border-white/5 text-sm">
+                {link.label}
+              </a>
+            ) : (
+              <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
+                className="block py-2.5 text-white/70 hover:text-white border-b border-white/5 text-sm">
+                {link.label}
+              </Link>
+            )
           ))}
           <div className="mt-3">
             {user ? (
