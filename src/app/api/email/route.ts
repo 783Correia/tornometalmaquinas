@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendOrderConfirmation, sendAdminNewOrder, sendPaymentApproved, sendShippingNotification } from "@/lib/email/resend";
+import { sendOrderConfirmation, sendAdminNewOrder, sendPaymentApproved, sendShippingNotification, sendContactMessage } from "@/lib/email/resend";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,6 +18,9 @@ export async function POST(req: NextRequest) {
         break;
       case "shipping":
         await sendShippingNotification(data);
+        break;
+      case "contact":
+        await sendContactMessage(data);
         break;
       default:
         return NextResponse.json({ error: "Invalid email type" }, { status: 400 });

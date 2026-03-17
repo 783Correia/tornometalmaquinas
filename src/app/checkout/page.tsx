@@ -169,7 +169,7 @@ export default function CheckoutPage() {
             address: fullAddress,
           },
         }),
-      }).catch(() => {}); // Fire and forget
+      }).catch((err) => console.error("Erro ao enviar email de confirmação:", err));
 
       // Create Mercado Pago preference
       try {

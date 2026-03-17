@@ -73,7 +73,8 @@ export function ProductForm({ product }: Props) {
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error } = await supabase.storage.from("product-images").upload(fileName, file);
       if (!error) {
-        const src = `https://lozduuvplbfiduaigjth.supabase.co/storage/v1/object/public/product-images/${fileName}`;
+        const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(fileName);
+        const src = urlData.publicUrl;
         setImages((prev) => [...prev, { src, alt: "", position: prev.length }]);
       }
     }

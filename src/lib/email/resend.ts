@@ -174,7 +174,39 @@ export async function sendShippingNotification(data: OrderEmailData) {
   }
 }
 
-// Email 4: New order notification for admin
+// Email 4: Contact form message
+export async function sendContactMessage(data: { name: string; email: string; message: string }) {
+  const html = emailLayout(`
+    <h2 style="color:#333;margin-top:0">Nova mensagem de contato</h2>
+
+    <div style="background:#f8f9fa;border-radius:8px;padding:16px;margin:16px 0">
+      <p style="margin:0 0 4px;color:#666;font-size:13px"><strong>Nome:</strong> ${data.name}</p>
+      <p style="margin:0 0 4px;color:#666;font-size:13px"><strong>E-mail:</strong> ${data.email}</p>
+    </div>
+
+    <div style="background:#f8f9fa;border-radius:8px;padding:16px;margin:16px 0">
+      <p style="margin:0 0 4px;font-weight:bold;color:#333;font-size:13px">Mensagem:</p>
+      <p style="margin:0;color:#666;font-size:13px;white-space:pre-wrap">${data.message}</p>
+    </div>
+
+    <p style="color:#666;font-size:13px">Responda diretamente para: <a href="mailto:${data.email}" style="color:#0264A5">${data.email}</a></p>
+  `);
+
+  try {
+    await getResend().emails.send({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
+      replyTo: data.email,
+      subject: `Contato via site - ${data.name}`,
+      html,
+    });
+  } catch (err) {
+    console.error("Error sending contact message:", err);
+    throw err;
+  }
+}
+
+// Email 5: New order notification for admin
 export async function sendAdminNewOrder(data: OrderEmailData) {
   const html = emailLayout(`
     <h2 style="color:#333;margin-top:0">Novo pedido recebido!</h2>

@@ -70,7 +70,7 @@ export default function AdminPedidos() {
               shippingMethod: order.notes?.replace("Frete: ", "") || "",
             },
           }),
-        }).catch(() => {});
+        }).catch((err) => console.error("Erro ao enviar email de rastreio:", err));
       }
     }
 

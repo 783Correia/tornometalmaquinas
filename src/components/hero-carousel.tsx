@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
   {
-    image: "/banner-1.png",
+    image: "/banner-1.webp",
     alt: "TornoMetal - 25 anos de tradição em peças agrícolas",
     title: "25 Anos de Tradição",
     subtitle: "e Qualidade no Campo",
@@ -18,7 +18,7 @@ const slides = [
     theme: "dark" as const, // dark bg = white text
   },
   {
-    image: "/banner-2.png",
+    image: "/banner-2.webp",
     alt: "Peças TornoMetal com durabilidade garantida",
     title: "Durabilidade que",
     subtitle: "Garante sua Produtividade",
@@ -29,7 +29,7 @@ const slides = [
     theme: "light" as const, // light bg = dark text
   },
   {
-    image: "/banner-3.png",
+    image: "/banner-3.webp",
     alt: "Peças para Semeato, Jumil, Imasa, Tatu e mais",
     title: "Catálogo Completo",
     subtitle: "para sua Plantadeira",
@@ -40,7 +40,7 @@ const slides = [
     theme: "light" as const,
   },
   {
-    image: "/banner-4.png",
+    image: "/banner-4.webp",
     alt: "Inovação e precisão em peças agrícolas TornoMetal",
     title: "Inovação e Precisão",
     subtitle: "em Cada Peça",
