@@ -10,6 +10,10 @@ type Props = {
     marca?: string;
     busca?: string;
     pagina?: string;
+    preco_min?: string;
+    preco_max?: string;
+    estoque?: string;
+    ordem?: string;
   }>;
 };
 
@@ -43,6 +47,26 @@ export default async function LojaPage({ searchParams }: Props) {
     query = query.ilike("name", `%${params.busca}%`);
   }
 
+  if (params.preco_min) {
+    query = query.gte("price", Number(params.preco_min));
+  }
+
+  if (params.preco_max) {
+    query = query.lte("price", Number(params.preco_max));
+  }
+
+  if (params.estoque === "1") {
+    query = query.gt("stock_quantity", 0);
+  }
+
+  if (params.ordem === "preco_asc") {
+    query = query.order("price", { ascending: true });
+  } else if (params.ordem === "preco_desc") {
+    query = query.order("price", { ascending: false });
+  } else if (params.ordem === "nome") {
+    query = query.order("name", { ascending: true });
+  }
+
   const { data: products, count } = await query;
   const totalPages = Math.ceil((count || 0) / PER_PAGE);
 
@@ -71,6 +95,10 @@ export default async function LojaPage({ searchParams }: Props) {
             brands={brands || []}
             activeCategory={params.categoria}
             activeBrand={params.marca}
+            priceMin={params.preco_min}
+            priceMax={params.preco_max}
+            inStockOnly={params.estoque === "1"}
+            sortBy={params.ordem}
           />
 
           <div className="flex-1">
@@ -89,6 +117,10 @@ export default async function LojaPage({ searchParams }: Props) {
                       if (params.categoria) qs.set("categoria", params.categoria);
                       if (params.marca) qs.set("marca", params.marca);
                       if (params.busca) qs.set("busca", params.busca);
+                      if (params.preco_min) qs.set("preco_min", params.preco_min);
+                      if (params.preco_max) qs.set("preco_max", params.preco_max);
+                      if (params.estoque) qs.set("estoque", params.estoque);
+                      if (params.ordem) qs.set("ordem", params.ordem);
                       qs.set("pagina", p.toString());
                       return (
                         <a

@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MercadoPagoConfig, Preference } from "mercadopago";
+import { createClient } from "@supabase/supabase-js";
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
 });
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -14,6 +20,28 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Server-side stock verification before creating payment
+    const { data: orderItems } = await supabase
+      .from("order_items")
+      .select("product_id, quantity")
+      .eq("order_id", orderId);
+
+    if (orderItems) {
+      for (const item of orderItems) {
+        const { data: product } = await supabase
+          .from("products")
+          .select("stock_quantity, manage_stock, name")
+          .eq("id", item.product_id)
+          .single();
+
+        if (product?.manage_stock && product.stock_quantity < item.quantity) {
+          return NextResponse.json(
+            { error: `Produto "${product.name}" sem estoque suficiente (disponível: ${product.stock_quantity})` },
+            { status: 409 }
+          );
+        }
+      }
+    }
     const preference = new Preference(client);
 
     const result = await preference.create({

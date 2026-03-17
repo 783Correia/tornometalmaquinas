@@ -44,5 +44,33 @@ export default async function ProductPage({ params }: Props) {
     .neq("id", product.id)
     .limit(4);
 
-  return <ProductDetail product={product} related={related || []} />;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.short_description || product.name,
+    sku: product.sku || undefined,
+    image: product.product_images?.[0]?.src || undefined,
+    brand: product.brands ? { "@type": "Brand", name: product.brands.name } : undefined,
+    category: product.categories?.name || undefined,
+    url: `${siteUrl}/produto/${product.slug}`,
+    offers: {
+      "@type": "Offer",
+      price: product.sale_price || product.price,
+      priceCurrency: "BRL",
+      availability: product.stock_quantity > 0
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      url: `${siteUrl}/produto/${product.slug}`,
+      seller: { "@type": "Organization", name: "TornoMetal Everton Lopes" },
+    },
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <ProductDetail product={product} related={related || []} />
+    </>
+  );
 }

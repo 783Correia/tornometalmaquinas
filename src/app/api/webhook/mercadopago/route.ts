@@ -13,7 +13,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 function verifyWebhookSignature(req: NextRequest, body: string): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
-  if (!secret) return true; // Skip if not configured yet
+  if (!secret) {
+    console.warn("⚠️ MP_WEBHOOK_SECRET not configured - webhook signature verification skipped");
+    return true;
+  }
 
   const xSignature = req.headers.get("x-signature");
   const xRequestId = req.headers.get("x-request-id");

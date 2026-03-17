@@ -65,6 +65,32 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "TornoMetal Everton Lopes",
+              url: SITE_URL,
+              logo: `${SITE_URL}/logo.png`,
+              description: "Fábrica de peças para plantadeiras em Passo Fundo/RS. Mais de 25 anos de tradição.",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Passo Fundo",
+                addressRegion: "RS",
+                addressCountry: "BR",
+              },
+              contactPoint: {
+                "@type": "ContactPoint",
+                telephone: "+55-54-3315-3969",
+                contactType: "sales",
+              },
+            }),
+          }}
+        />
+      </head>
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
         <Header />
         <main className="min-h-screen">{children}</main>
