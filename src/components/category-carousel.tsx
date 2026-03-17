@@ -17,7 +17,7 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
 
   function scroll(direction: "left" | "right") {
     if (!scrollRef.current) return;
-    const amount = 180;
+    const amount = 250;
     scrollRef.current.scrollBy({
       left: direction === "left" ? -amount : amount,
       behavior: "smooth",
@@ -34,36 +34,40 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
           <p className="text-sm md:text-base text-gray-500">Encontre a peça que precisa por categoria</p>
         </div>
 
-        <div className="relative overflow-hidden">
+        <div className="relative group">
           {/* Left arrow */}
           <button
             onClick={() => scroll("left")}
-            className="absolute left-1 md:left-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 text-primary p-1.5 md:p-2 rounded-full hover:scale-110 transition-all"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 text-primary p-1.5 md:p-2 rounded-full hover:scale-110 transition-all opacity-80 hover:opacity-100"
             aria-label="Anterior"
           >
-            <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
+            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
           </button>
+
+          {/* Fade edges */}
+          <div className="pointer-events-none absolute left-8 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-50 to-transparent z-[5]" />
+          <div className="pointer-events-none absolute right-8 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 to-transparent z-[5]" />
 
           {/* Scrollable container */}
           <div
             ref={scrollRef}
-            className="flex gap-4 md:gap-8 overflow-x-auto scrollbar-hide px-12 md:px-16 py-2"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            className="flex gap-5 md:gap-7 overflow-x-auto px-10 md:px-12 py-3"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
           >
             {categories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/loja?categoria=${cat.slug}`}
-                className="flex flex-col items-center gap-2 md:gap-3 shrink-0 group"
+                className="flex flex-col items-center gap-2 md:gap-3 shrink-0 group/item"
               >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border-3 md:border-4 border-blue-100 group-hover:border-primary/40 flex items-center justify-center overflow-hidden transition-all group-hover:scale-105 group-hover:shadow-lg">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border-3 md:border-4 border-blue-100 group-hover/item:border-primary/40 flex items-center justify-center overflow-hidden transition-all group-hover/item:scale-105 group-hover/item:shadow-lg">
                   {cat.image ? (
                     <Image
                       src={cat.image}
                       alt={cat.name}
-                      width={128}
-                      height={128}
-                      className="object-cover w-full h-full rounded-full p-1.5 md:p-2"
+                      width={112}
+                      height={112}
+                      className="object-cover w-full h-full rounded-full p-1.5"
                     />
                   ) : (
                     <span className="text-2xl md:text-3xl text-primary/30 font-bold">
@@ -71,22 +75,20 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
                     </span>
                   )}
                 </div>
-                <span className="text-[11px] sm:text-xs md:text-sm font-semibold text-gray-700 group-hover:text-primary transition-colors text-center max-w-[80px] md:max-w-none leading-tight">
+                <span className="text-[11px] sm:text-xs md:text-sm font-semibold text-gray-700 group-hover/item:text-primary transition-colors text-center max-w-[80px] md:max-w-[100px] leading-tight">
                   {cat.name}
                 </span>
               </Link>
             ))}
-            {/* Spacer to prevent last item from being cut */}
-            <div className="shrink-0 w-4 md:w-8" aria-hidden="true" />
           </div>
 
           {/* Right arrow */}
           <button
             onClick={() => scroll("right")}
-            className="absolute right-1 md:right-2 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 text-primary p-1.5 md:p-2 rounded-full hover:scale-110 transition-all"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-lg border border-gray-200 text-primary p-1.5 md:p-2 rounded-full hover:scale-110 transition-all opacity-80 hover:opacity-100"
             aria-label="Próximo"
           >
-            <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
           </button>
         </div>
       </div>
