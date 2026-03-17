@@ -127,17 +127,17 @@ export function Header() {
           </div>
 
           {/* Mobile */}
-          <div className="flex md:hidden items-center gap-3">
-            <Link href="/carrinho" className="relative text-white/80">
-              <ShoppingCart size={22} />
+          <div className="flex md:hidden items-center gap-1">
+            <Link href="/carrinho" className="relative text-white/80 p-2.5">
+              <ShoppingCart size={24} />
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary-light text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                <span className="absolute top-0.5 right-0.5 bg-primary-light text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
                   {totalItems}
                 </span>
               )}
             </Link>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="p-1.5 text-white/80">
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2.5 text-white/80">
+              {menuOpen ? <X size={26} /> : <Menu size={26} />}
             </button>
           </div>
         </div>
@@ -162,12 +162,12 @@ export function Header() {
             "external" in link ? (
               <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="block py-2.5 text-white/70 hover:text-white border-b border-white/5 text-sm">
+                className="block py-3.5 text-white/70 hover:text-white border-b border-white/5 text-base font-medium">
                 {link.label}
               </a>
             ) : (
               <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
-                className="block py-2.5 text-white/70 hover:text-white border-b border-white/5 text-sm">
+                className="block py-3.5 text-white/70 hover:text-white border-b border-white/5 text-base font-medium">
                 {link.label}
               </Link>
             )

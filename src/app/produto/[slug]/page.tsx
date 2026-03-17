@@ -36,6 +36,11 @@ export default async function ProductPage({ params }: Props) {
 
   if (!product) notFound();
 
+  // Sort images by position
+  if (product.product_images) {
+    product.product_images.sort((a: { position?: number }, b: { position?: number }) => (a.position ?? 0) - (b.position ?? 0));
+  }
+
   // Related products
   const { data: related } = await supabase
     .from("products")

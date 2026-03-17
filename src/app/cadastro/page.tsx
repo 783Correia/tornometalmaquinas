@@ -73,7 +73,7 @@ export default function CadastroPage() {
             <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)}
               className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="seu@email.com" required />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefone</label>
               <input type="text" value={form.phone} onChange={(e) => update("phone", formatPhone(e.target.value))}
@@ -85,7 +85,7 @@ export default function CadastroPage() {
                 className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="000.000.000-00" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">CNPJ</label>
               <input type="text" value={form.cnpj} onChange={(e) => update("cnpj", formatCNPJ(e.target.value))}

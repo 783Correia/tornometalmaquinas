@@ -162,17 +162,17 @@ export function HeroCarousel() {
       {/* Arrows */}
       <button
         onClick={prev}
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 md:p-2.5 rounded-full shadow-md transition-all hover:scale-110"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2.5 md:p-3 rounded-full shadow-md transition-all hover:scale-110"
         aria-label="Anterior"
       >
-        <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+        <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
       </button>
       <button
         onClick={next}
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-1.5 md:p-2.5 rounded-full shadow-md transition-all hover:scale-110"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2.5 md:p-3 rounded-full shadow-md transition-all hover:scale-110"
         aria-label="Próximo"
       >
-        <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+        <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
       </button>
 
       {/* Dots */}

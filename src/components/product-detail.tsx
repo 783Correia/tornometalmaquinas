@@ -15,7 +15,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
   const [added, setAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
-  const images = product.product_images || [];
+  const images = (product.product_images || []).sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   const currentImage = images[selectedImage];
 
   function handleAdd() {
@@ -48,9 +48,9 @@ export function ProductDetail({ product, related }: { product: Product; related:
           <div className="grid md:grid-cols-2 gap-8">
             {/* Images */}
             <div>
-              <div className="aspect-square relative bg-gray-50 rounded-xl overflow-hidden mb-3 border border-gray-100">
+              <div className="aspect-square relative bg-white rounded-xl overflow-hidden mb-3 border border-gray-100">
                 {currentImage ? (
-                  <Image src={currentImage.src} alt={product.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" priority />
+                  <Image src={currentImage.src} alt={product.name} fill className="object-contain p-2" sizes="(max-width: 768px) 100vw, 50vw" priority />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300">Sem imagem</div>
                 )}
@@ -61,11 +61,12 @@ export function ProductDetail({ product, related }: { product: Product; related:
                     <button
                       key={img.id}
                       onClick={() => setSelectedImage(i)}
-                      className={`w-16 h-16 relative rounded-lg overflow-hidden shrink-0 border-2 transition ${
+                      className={`w-18 h-18 sm:w-16 sm:h-16 relative rounded-lg overflow-hidden shrink-0 border-2 transition ${
                         i === selectedImage ? "border-primary" : "border-gray-200 hover:border-gray-300"
                       }`}
+                      style={{ minWidth: 64, minHeight: 64 }}
                     >
-                      <Image src={img.src} alt="" fill className="object-cover" sizes="64px" />
+                      <Image src={img.src} alt="" fill className="object-contain p-0.5" sizes="72px" />
                     </button>
                   ))}
                 </div>
@@ -112,14 +113,14 @@ export function ProductDetail({ product, related }: { product: Product; related:
                 )}
               </div>
 
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center border-2 border-gray-200 rounded-xl">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3 text-gray-500 hover:text-primary transition">
-                    <Minus size={16} />
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+                <div className="flex items-center justify-center border-2 border-gray-200 rounded-xl">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3.5 text-gray-500 hover:text-primary transition">
+                    <Minus size={18} />
                   </button>
-                  <span className="px-4 font-medium text-gray-900">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} className="p-3 text-gray-500 hover:text-primary transition">
-                    <Plus size={16} />
+                  <span className="px-5 font-medium text-gray-900 text-lg">{quantity}</span>
+                  <button onClick={() => setQuantity(quantity + 1)} className="p-3.5 text-gray-500 hover:text-primary transition">
+                    <Plus size={18} />
                   </button>
                 </div>
                 <button
@@ -139,7 +140,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
               {(product.weight > 0 || product.length > 0) && (
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                   <h3 className="font-semibold mb-3 text-sm text-gray-900">Especificações</h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                     {product.weight > 0 && (
                       <div className="flex justify-between bg-white rounded-lg px-3 py-2 border border-gray-100">
                         <span className="text-gray-500">Peso</span>

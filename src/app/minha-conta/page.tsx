@@ -112,7 +112,7 @@ export default function MinhaContaPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">E-mail</label>
                 <input type="email" value={customer.email} disabled className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm bg-gray-50 text-gray-400 cursor-not-allowed" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefone</label>
                   <input type="text" value={customer.phone || ""} onChange={(e) => update("phone", e.target.value)} className={inputClass} />
@@ -122,7 +122,7 @@ export default function MinhaContaPage() {
                   <input type="text" value={customer.cpf || ""} onChange={(e) => update("cpf", e.target.value)} className={inputClass} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">CNPJ</label>
                   <input type="text" value={customer.cnpj || ""} onChange={(e) => update("cnpj", e.target.value)} className={inputClass} />
@@ -144,8 +144,8 @@ export default function MinhaContaPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">CEP</label>
                 <input type="text" value={customer.address_zip || ""} onChange={(e) => update("address_zip", e.target.value)} className={`${inputClass} max-w-xs`} placeholder="00000-000" />
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Rua</label>
                   <input type="text" value={customer.address_street || ""} onChange={(e) => update("address_street", e.target.value)} className={inputClass} />
                 </div>
@@ -162,7 +162,7 @@ export default function MinhaContaPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Bairro</label>
                 <input type="text" value={customer.address_neighborhood || ""} onChange={(e) => update("address_neighborhood", e.target.value)} className={inputClass} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Cidade</label>
                   <input type="text" value={customer.address_city || ""} onChange={(e) => update("address_city", e.target.value)} className={inputClass} />

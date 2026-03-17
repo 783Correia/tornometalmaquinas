@@ -16,10 +16,13 @@ async function getFeaturedProducts() {
     .order("created_at", { ascending: false })
     .limit(40);
 
-  // Filter only products with at least one image
-  const withImages = (data || []).filter(
-    (p) => p.product_images && p.product_images.length > 0
-  );
+  // Filter only products with at least one image, sort images by position
+  const withImages = (data || [])
+    .filter((p) => p.product_images && p.product_images.length > 0)
+    .map((p) => ({
+      ...p,
+      product_images: p.product_images.sort((a: { position?: number }, b: { position?: number }) => (a.position ?? 0) - (b.position ?? 0)),
+    }));
   return withImages.slice(0, 8);
 }
 

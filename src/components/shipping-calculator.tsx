@@ -57,8 +57,7 @@ export function ShippingCalculator({ products, onSelect }: Props) {
 
       if (data.error) { setError(data.error); }
       else if (data.options?.length === 0) {
-        const debugMsg = data.debug ? JSON.stringify(data.debug[0]?.error || data.debug, null, 2) : "";
-        setError(`Nenhuma opção de frete disponível. ${debugMsg}`);
+        setError("Nenhuma opção de frete disponível para este CEP. Verifique o CEP ou entre em contato conosco.");
       }
       else { setOptions(data.options); }
     } catch {

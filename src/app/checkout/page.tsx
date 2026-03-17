@@ -221,19 +221,19 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Finalizar Compra</h1>
 
         {/* Steps */}
-        <div className="flex items-center gap-2 mb-8">
+        <div className="flex items-center justify-between mb-8 overflow-x-auto">
           {[
             { n: 1, label: "Endereço", icon: <MapPin size={16} /> },
             { n: 2, label: "Frete", icon: <Truck size={16} /> },
             { n: 3, label: "Confirmação", icon: <CreditCard size={16} /> },
           ].map((s) => (
-            <div key={s.n} className="flex items-center gap-2">
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition ${
+            <div key={s.n} className="flex items-center gap-1 sm:gap-2 shrink-0">
+              <div className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition ${
                 step >= s.n ? "bg-primary text-white" : "bg-white text-gray-400 border border-gray-200"
               }`}>
-                {step > s.n ? <CheckCircle size={16} /> : s.icon} {s.label}
+                {step > s.n ? <CheckCircle size={16} /> : s.icon} <span className="hidden sm:inline">{s.label}</span><span className="sm:hidden">{s.n}</span>
               </div>
-              {s.n < 3 && <div className={`w-8 h-0.5 ${step > s.n ? "bg-primary" : "bg-gray-200"}`} />}
+              {s.n < 3 && <div className={`w-4 sm:w-8 h-0.5 ${step > s.n ? "bg-primary" : "bg-gray-200"}`} />}
             </div>
           ))}
         </div>
@@ -255,8 +255,8 @@ export default function CheckoutPage() {
                     {cepLoading && <Loader2 size={20} className="animate-spin text-primary mt-2" />}
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Rua *</label>
                     <input type="text" value={address.address_street} onChange={(e) => updateAddress("address_street", e.target.value)} className={inputClass} />
                   </div>
@@ -273,7 +273,7 @@ export default function CheckoutPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
                   <input type="text" value={address.address_neighborhood} onChange={(e) => updateAddress("address_neighborhood", e.target.value)} className={inputClass} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Cidade *</label>
                     <input type="text" value={address.address_city} onChange={(e) => updateAddress("address_city", e.target.value)} className={inputClass} />
@@ -385,7 +385,7 @@ export default function CheckoutPage() {
 
           {/* Sidebar - Order Summary */}
           <div>
-            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm sticky top-4">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm lg:sticky lg:top-20">
               <h3 className="font-semibold text-gray-900 mb-4">Resumo</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">

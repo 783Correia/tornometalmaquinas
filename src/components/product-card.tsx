@@ -8,7 +8,8 @@ import type { Product } from "@/lib/supabase";
 
 export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((s) => s.addItem);
-  const image = product.product_images?.[0];
+  const sortedImages = (product.product_images || []).sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+  const image = sortedImages[0];
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -37,7 +38,7 @@ export function ProductCard({ product }: { product: Product }) {
             src={image.src}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-contain group-hover:scale-105 transition-transform duration-300 p-1"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
@@ -61,15 +62,15 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         )}
       </div>
-      <div className="p-2.5 md:p-3.5">
+      <div className="p-3 md:p-3.5">
         <div className="flex items-center gap-1 md:gap-1.5 mb-1 md:mb-1.5">
           {product.brands && (
-            <span className="text-[10px] md:text-[11px] font-semibold text-primary bg-blue-50 px-1.5 md:px-2 py-0.5 rounded-full truncate max-w-[100px] md:max-w-none">
+            <span className="text-[11px] md:text-xs font-semibold text-primary bg-blue-50 px-1.5 md:px-2 py-0.5 rounded-full truncate max-w-[120px] md:max-w-none">
               {product.brands.name}
             </span>
           )}
           {product.categories && (
-            <span className="text-[10px] md:text-[11px] text-gray-400 hidden sm:inline">
+            <span className="text-[11px] md:text-xs text-gray-400 hidden sm:inline">
               {product.categories.name}
             </span>
           )}
@@ -78,30 +79,30 @@ export function ProductCard({ product }: { product: Product }) {
           {product.name}
         </h3>
         {product.sku && (
-          <p className="text-[10px] md:text-[11px] text-gray-400 mb-1.5 md:mb-2 hidden sm:block">SKU: {product.sku}</p>
+          <p className="text-[11px] md:text-xs text-gray-400 mb-1.5 md:mb-2 hidden sm:block">SKU: {product.sku}</p>
         )}
         <div className="flex items-center justify-between">
           <div>
             {product.sale_price ? (
               <div>
-                <span className="text-[10px] md:text-xs text-gray-400 line-through">
+                <span className="text-[11px] md:text-xs text-gray-400 line-through">
                   R$ {product.regular_price.toFixed(2)}
                 </span>
-                <span className="text-sm md:text-lg font-bold text-success block -mt-0.5">
+                <span className="text-base md:text-lg font-bold text-success block -mt-0.5">
                   R$ {product.sale_price.toFixed(2)}
                 </span>
               </div>
             ) : (
-              <span className="text-sm md:text-lg font-bold text-gray-900">
+              <span className="text-base md:text-lg font-bold text-gray-900">
                 R$ {product.price.toFixed(2)}
               </span>
             )}
           </div>
           <button
             onClick={handleAdd}
-            className="p-2 md:p-2.5 bg-primary text-white rounded-lg md:rounded-xl hover:bg-primary-dark transition hover:scale-105 shadow-sm"
+            className="p-2.5 md:p-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition hover:scale-105 shadow-sm"
           >
-            <ShoppingCart className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <ShoppingCart className="w-4 h-4 md:w-4 md:h-4" />
           </button>
         </div>
       </div>
