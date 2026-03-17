@@ -6,7 +6,7 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { useCartStore } from "@/lib/cart-store";
 import { ShippingCalculator } from "@/components/shipping-calculator";
-import { MapPin, Truck, CreditCard, Loader2, CheckCircle, Tag } from "lucide-react";
+import { MapPin, Truck, CreditCard, Loader2, CheckCircle } from "lucide-react";
 
 type Address = {
   address_zip: string;
@@ -40,11 +40,6 @@ export default function CheckoutPage() {
   });
   const [shipping, setShipping] = useState<ShippingOption | null>(null);
   const [cepLoading, setCepLoading] = useState(false);
-  const [couponCode, setCouponCode] = useState("");
-  const [couponDiscount, setCouponDiscount] = useState(0);
-  const [couponApplied, setCouponApplied] = useState("");
-  const [couponError, setCouponError] = useState("");
-  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     async function init() {
@@ -98,61 +93,6 @@ export default function CheckoutPage() {
     return d.length > 5 ? d.replace(/(\d{5})(\d)/, "$1-$2") : d;
   }
 
-  async function applyCoupon() {
-    if (!couponCode.trim()) return;
-    setCouponLoading(true);
-    setCouponError("");
-
-    const { data: coupon } = await supabase
-      .from("coupons")
-      .select("*")
-      .eq("code", couponCode.trim().toUpperCase())
-      .single();
-
-    if (!coupon) {
-      setCouponError("Cupom inválido");
-      setCouponLoading(false);
-      return;
-    }
-
-    if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
-      setCouponError("Cupom expirado");
-      setCouponLoading(false);
-      return;
-    }
-
-    if (coupon.max_uses && coupon.uses >= coupon.max_uses) {
-      setCouponError("Cupom esgotado");
-      setCouponLoading(false);
-      return;
-    }
-
-    if (coupon.min_value && totalPrice() < coupon.min_value) {
-      setCouponError(`Valor mínimo: R$ ${coupon.min_value.toFixed(2).replace(".", ",")}`);
-      setCouponLoading(false);
-      return;
-    }
-
-    let discount = 0;
-    if (coupon.type === "percentage") {
-      discount = totalPrice() * (coupon.value / 100);
-      if (coupon.max_discount) discount = Math.min(discount, coupon.max_discount);
-    } else {
-      discount = coupon.value;
-    }
-
-    setCouponDiscount(discount);
-    setCouponApplied(coupon.code);
-    setCouponLoading(false);
-  }
-
-  function removeCoupon() {
-    setCouponDiscount(0);
-    setCouponApplied("");
-    setCouponCode("");
-    setCouponError("");
-  }
-
   function canAdvanceStep1() {
     return address.address_zip && address.address_street && address.address_number && address.address_city && address.address_state;
   }
@@ -188,21 +128,14 @@ export default function CheckoutPage() {
     const { data: order } = await supabase.from("orders").insert({
       customer_id: userId,
       status: "pending",
-      total: totalPrice() - couponDiscount + shipping.price,
+      total: totalPrice() + shipping.price,
       shipping_cost: shipping.price,
-      discount: couponDiscount || null,
-      coupon_code: couponApplied || null,
       payment_method: null,
       payment_status: "pending",
       notes: `Frete: ${shipping.company} - ${shipping.name} (${shipping.delivery_time} dias)`,
     }).select("id").single();
 
     if (order) {
-      // Increment coupon usage
-      if (couponApplied) {
-        await supabase.rpc("increment_coupon_uses", { p_code: couponApplied });
-      }
-
       // Create order items
       await supabase.from("order_items").insert(
         items.map((item) => ({
@@ -230,7 +163,7 @@ export default function CheckoutPage() {
             customerName: profile?.full_name || "",
             customerEmail: profile?.email || user?.email || "",
             items: items.map((item) => ({ product_name: item.name, quantity: item.quantity, price: item.price })),
-            total: totalPrice() - couponDiscount + shipping.price,
+            total: totalPrice() + shipping.price,
             shippingCost: shipping.price,
             shippingMethod: `${shipping.company} - ${shipping.name}`,
             address: fullAddress,
@@ -465,51 +398,12 @@ export default function CheckoutPage() {
                     <span>R$ {shipping.price.toFixed(2).replace(".", ",")}</span>
                   </div>
                 )}
-                {couponDiscount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Cupom ({couponApplied})</span>
-                    <span>- R$ {couponDiscount.toFixed(2).replace(".", ",")}</span>
-                  </div>
-                )}
                 <div className="flex justify-between pt-3 border-t border-gray-100 text-base">
                   <span className="font-semibold">Total</span>
                   <span className="font-bold text-primary">
-                    R$ {(totalPrice() - couponDiscount + (shipping?.price || 0)).toFixed(2).replace(".", ",")}
+                    R$ {(totalPrice() + (shipping?.price || 0)).toFixed(2).replace(".", ",")}
                   </span>
                 </div>
-              </div>
-
-              {/* Coupon */}
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                {couponApplied ? (
-                  <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-2.5">
-                    <div className="flex items-center gap-2 text-green-700 text-sm font-medium">
-                      <Tag size={14} />
-                      {couponApplied}
-                    </div>
-                    <button onClick={removeCoupon} className="text-xs text-red-500 hover:underline">Remover</button>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        placeholder="Cupom de desconto"
-                        className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary transition"
-                      />
-                      <button
-                        onClick={applyCoupon}
-                        disabled={couponLoading || !couponCode.trim()}
-                        className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition disabled:opacity-50"
-                      >
-                        {couponLoading ? "..." : "Aplicar"}
-                      </button>
-                    </div>
-                    {couponError && <p className="text-red-500 text-xs mt-1.5">{couponError}</p>}
-                  </div>
-                )}
               </div>
             </div>
           </div>
