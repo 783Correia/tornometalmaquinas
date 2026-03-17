@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import type { Category, Brand } from "@/lib/supabase";
 
 type Props = {
@@ -8,29 +12,58 @@ type Props = {
   activeBrand?: string;
 };
 
-export function FilterSidebar({ categories, brands, activeCategory, activeBrand }: Props) {
+function CollapsibleSection({
+  title,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
-    <aside className="w-full md:w-56 shrink-0 space-y-4">
-      <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-        <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-400 mb-3">
-          Categorias
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between p-4 text-left"
+      >
+        <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-400">
+          {title}
         </h3>
-        <ul className="space-y-0.5">
-          <li>
-            <Link
-              href="/loja"
-              className={`block px-3 py-2 rounded-lg text-sm transition ${
-                !activeCategory && !activeBrand
-                  ? "bg-primary text-white font-medium"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-primary"
-              }`}
-            >
-              Todas
-            </Link>
-          </li>
-          {categories
-            .filter((c) => c.slug !== "sem-categoria")
-            .map((cat) => (
+        <ChevronDown
+          className={`w-4 h-4 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <div className="px-4 pb-4 -mt-1">{children}</div>}
+    </div>
+  );
+}
+
+export function FilterSidebar({ categories, brands, activeCategory, activeBrand }: Props) {
+  const filteredCategories = categories.filter((c) => c.slug !== "sem-categoria");
+  const hasActiveFilter = !!activeCategory || !!activeBrand;
+
+  return (
+    <aside className="w-full md:w-56 shrink-0 space-y-3 md:space-y-4">
+      {/* Mobile: collapsible / Desktop: always open */}
+      <div className="md:hidden space-y-3">
+        <CollapsibleSection title="Categorias" defaultOpen={!!activeCategory}>
+          <ul className="space-y-0.5">
+            <li>
+              <Link
+                href="/loja"
+                className={`block px-3 py-2 rounded-lg text-sm transition ${
+                  !activeCategory && !activeBrand
+                    ? "bg-primary text-white font-medium"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-primary"
+                }`}
+              >
+                Todas
+              </Link>
+            </li>
+            {filteredCategories.map((cat) => (
               <li key={cat.id}>
                 <Link
                   href={`/loja?categoria=${cat.slug}`}
@@ -44,29 +77,95 @@ export function FilterSidebar({ categories, brands, activeCategory, activeBrand 
                 </Link>
               </li>
             ))}
-        </ul>
+          </ul>
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Marcas" defaultOpen={!!activeBrand}>
+          <ul className="space-y-0.5">
+            {brands.map((brand) => (
+              <li key={brand.id}>
+                <Link
+                  href={`/loja?marca=${brand.slug}`}
+                  className={`block px-3 py-2 rounded-lg text-sm transition ${
+                    activeBrand === brand.slug
+                      ? "bg-primary text-white font-medium"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-primary"
+                  }`}
+                >
+                  {brand.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </CollapsibleSection>
+
+        {hasActiveFilter && (
+          <Link
+            href="/loja"
+            className="block text-center text-sm text-primary font-medium py-2 hover:underline"
+          >
+            Limpar filtros
+          </Link>
+        )}
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-        <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-400 mb-3">
-          Marcas
-        </h3>
-        <ul className="space-y-0.5">
-          {brands.map((brand) => (
-            <li key={brand.id}>
+      {/* Desktop: always visible */}
+      <div className="hidden md:block space-y-4">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-400 mb-3">
+            Categorias
+          </h3>
+          <ul className="space-y-0.5">
+            <li>
               <Link
-                href={`/loja?marca=${brand.slug}`}
+                href="/loja"
                 className={`block px-3 py-2 rounded-lg text-sm transition ${
-                  activeBrand === brand.slug
+                  !activeCategory && !activeBrand
                     ? "bg-primary text-white font-medium"
                     : "text-gray-600 hover:bg-gray-50 hover:text-primary"
                 }`}
               >
-                {brand.name}
+                Todas
               </Link>
             </li>
-          ))}
-        </ul>
+            {filteredCategories.map((cat) => (
+              <li key={cat.id}>
+                <Link
+                  href={`/loja?categoria=${cat.slug}`}
+                  className={`block px-3 py-2 rounded-lg text-sm transition ${
+                    activeCategory === cat.slug
+                      ? "bg-primary text-white font-medium"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-primary"
+                  }`}
+                >
+                  {cat.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <h3 className="font-semibold text-xs uppercase tracking-wider text-gray-400 mb-3">
+            Marcas
+          </h3>
+          <ul className="space-y-0.5">
+            {brands.map((brand) => (
+              <li key={brand.id}>
+                <Link
+                  href={`/loja?marca=${brand.slug}`}
+                  className={`block px-3 py-2 rounded-lg text-sm transition ${
+                    activeBrand === brand.slug
+                      ? "bg-primary text-white font-medium"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-primary"
+                  }`}
+                >
+                  {brand.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </aside>
   );
