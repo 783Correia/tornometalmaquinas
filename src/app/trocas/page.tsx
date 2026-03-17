@@ -61,6 +61,18 @@ export default function TrocasPage() {
           <h2>8. Contato</h2>
           <p>Telefone: (54) 3315-3969<br />WhatsApp: (54) 3315-3969<br />Horário: Segunda a Sexta, 8h às 18h</p>
         </div>
+
+        <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+          <p className="text-gray-700 font-medium mb-4">Precisa solicitar uma troca ou devolução?</p>
+          <a
+            href="https://wa.me/555433153969?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20uma%20troca%2Fdevolu%C3%A7%C3%A3o.%20Meu%20n%C3%BAmero%20de%20pedido%20%C3%A9%3A%20"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-green-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-green-600 transition"
+          >
+            Solicitar pelo WhatsApp
+          </a>
+        </div>
       </div>
     </div>
   );

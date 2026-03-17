@@ -96,3 +96,13 @@ export type OrderItem = {
   price: number
   product_name: string
 }
+
+export type Review = {
+  id: number
+  product_id: number
+  customer_id: string
+  customer_name: string
+  rating: number
+  comment: string
+  created_at: string
+}

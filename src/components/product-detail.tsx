@@ -7,6 +7,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { ProductCard } from "@/components/product-card";
 import Link from "next/link";
 import type { Product } from "@/lib/supabase";
+import { ProductReviews } from "@/components/product-reviews";
 
 export function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
   const [selectedImage, setSelectedImage] = useState(0);
@@ -88,6 +89,18 @@ export function ProductDetail({ product, related }: { product: Product; related:
 
               {product.sku && <p className="text-sm text-gray-400 mt-2">SKU: {product.sku}</p>}
 
+              {product.manage_stock && (
+                <div className="mt-2">
+                  {product.stock_quantity > 5 ? (
+                    <span className="text-xs font-medium text-green-600 bg-green-50 px-2.5 py-1 rounded-full">Em estoque</span>
+                  ) : product.stock_quantity > 0 ? (
+                    <span className="text-xs font-medium text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full">Últimas {product.stock_quantity} unidades</span>
+                  ) : (
+                    <span className="text-xs font-medium text-red-600 bg-red-50 px-2.5 py-1 rounded-full">Fora de estoque</span>
+                  )}
+                </div>
+              )}
+
               <div className="mt-6 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
                 {product.sale_price ? (
                   <div>
@@ -111,12 +124,15 @@ export function ProductDetail({ product, related }: { product: Product; related:
                 </div>
                 <button
                   onClick={handleAdd}
+                  disabled={product.manage_stock && product.stock_quantity <= 0}
                   className={`flex-1 flex items-center justify-center gap-2 font-semibold py-3.5 px-6 rounded-xl transition-all shadow-sm ${
-                    added ? "bg-success text-white" : "bg-primary text-white hover:bg-primary-dark hover:scale-[1.02]"
+                    product.manage_stock && product.stock_quantity <= 0
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : added ? "bg-success text-white" : "bg-primary text-white hover:bg-primary-dark hover:scale-[1.02]"
                   }`}
                 >
                   <ShoppingCart size={20} />
-                  {added ? "Adicionado!" : "Adicionar ao Carrinho"}
+                  {product.manage_stock && product.stock_quantity <= 0 ? "Indisponível" : added ? "Adicionado!" : "Adicionar ao Carrinho"}
                 </button>
               </div>
 
@@ -162,6 +178,9 @@ export function ProductDetail({ product, related }: { product: Product; related:
             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.description.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/on\w+\s*=\s*["'][^"']*["']/gi, "").replace(/javascript:/gi, "") }} />
           </div>
         )}
+
+        {/* Reviews */}
+        <ProductReviews productId={product.id} />
 
         {/* Related */}
         {related.length > 0 && (
