@@ -32,7 +32,7 @@ export default function CarrinhoPage() {
 
         <div className="space-y-3">
           {items.map((item) => (
-            <div key={item.id} className="flex gap-4 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+            <div key={item.id} className="flex gap-3 sm:gap-4 bg-white border border-gray-200 rounded-2xl p-3 sm:p-4 shadow-sm">
               <div className="w-20 h-20 relative rounded-xl overflow-hidden bg-gray-50 shrink-0 border border-gray-100">
                 {item.image ? (
                   <Image src={item.image} alt={item.name} fill className="object-cover" sizes="80px" />

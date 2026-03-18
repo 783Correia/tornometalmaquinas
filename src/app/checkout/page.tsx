@@ -213,7 +213,7 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Finalizar Compra</h1>
 
         {/* Steps */}
-        <div className="flex items-center justify-between mb-8 overflow-x-auto">
+        <div className="flex items-center justify-center sm:justify-between mb-8 gap-1 sm:gap-0">
           {[
             { n: 1, label: "Endereço", icon: <MapPin size={16} /> },
             { n: 2, label: "Frete", icon: <Truck size={16} /> },

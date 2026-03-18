@@ -91,7 +91,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
+      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground overflow-x-hidden`}>
         <Header />
         <main className="min-h-screen">{children}</main>
         <Footer />

@@ -88,7 +88,7 @@ export function ShippingCalculator({ products, onSelect }: Props) {
         <button
           onClick={calculate}
           disabled={loading}
-          className="bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center gap-2"
+          className="bg-primary text-white px-3 sm:px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center gap-2 shrink-0"
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : null}
           {loading ? "Calculando..." : "Calcular"}
@@ -109,18 +109,18 @@ export function ShippingCalculator({ products, onSelect }: Props) {
                   : "border-gray-200 hover:border-gray-300"
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 {opt.logo && (
-                  <img src={opt.logo} alt={opt.company} className="w-8 h-8 object-contain" />
+                  <img src={opt.logo} alt={opt.company} className="w-8 h-8 object-contain shrink-0" />
                 )}
-                <div className="text-left">
-                  <p className="font-medium text-gray-900">{opt.company} - {opt.name}</p>
+                <div className="text-left min-w-0">
+                  <p className="font-medium text-gray-900 truncate">{opt.company} - {opt.name}</p>
                   <p className="text-gray-500 text-xs">
                     {opt.delivery_time} {opt.delivery_time === 1 ? "dia útil" : "dias úteis"}
                   </p>
                 </div>
               </div>
-              <span className="font-bold text-primary">
+              <span className="font-bold text-primary shrink-0 ml-2">
                 R$ {opt.price.toFixed(2).replace(".", ",")}
               </span>
             </button>
