@@ -107,70 +107,44 @@ export default function CheckoutPage() {
     setOrderError("");
 
     try {
-      // Validate stock before placing order
-      for (const item of items) {
-        const { data: product } = await supabase
-          .from("products")
-          .select("stock_quantity, manage_stock, name")
-          .eq("id", item.id)
-          .single();
+      // Step 1: Create order via server-side API (bypasses RLS)
+      const checkoutRes = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          items: items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          shipping: {
+            price: shipping.price,
+            total: totalPrice() + shipping.price,
+            company: shipping.company,
+            name: shipping.name,
+            delivery_time: shipping.delivery_time,
+          },
+          address,
+        }),
+      });
 
-        if (product?.manage_stock && product.stock_quantity < item.quantity) {
-          setOrderError(`Produto "${product.name}" tem apenas ${product.stock_quantity} unidade(s) em estoque.`);
-          setPlacing(false);
-          return;
-        }
-      }
+      const checkoutData = await checkoutRes.json();
 
-      // Save address to customer profile
-      await supabase.from("customers").update({
-        address_zip: address.address_zip, address_street: address.address_street,
-        address_number: address.address_number, address_complement: address.address_complement,
-        address_neighborhood: address.address_neighborhood, address_city: address.address_city,
-        address_state: address.address_state,
-      }).eq("id", userId);
-
-      // Create order
-      const { data: order, error: orderErr } = await supabase.from("orders").insert({
-        customer_id: userId,
-        status: "pending",
-        total: totalPrice() + shipping.price,
-        shipping_cost: shipping.price,
-        payment_method: null,
-        payment_status: "pending",
-        notes: `Frete: ${shipping.company} - ${shipping.name} (${shipping.delivery_time} dias)`,
-      }).select("id").single();
-
-      if (orderErr || !order) {
-        console.error("Order creation error:", orderErr);
-        setOrderError("Erro ao criar pedido. Tente novamente.");
+      if (!checkoutRes.ok) {
+        setOrderError(checkoutData.error || "Erro ao criar pedido. Tente novamente.");
         setPlacing(false);
         return;
       }
 
-      // Create order items
-      const { error: itemsErr } = await supabase.from("order_items").insert(
-        items.map((item) => ({
-          order_id: order.id,
-          product_id: item.id,
-          product_name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-        }))
-      );
+      const orderId = checkoutData.orderId;
 
-      if (itemsErr) {
-        console.error("Order items error:", itemsErr);
-        setOrderError("Erro ao salvar itens do pedido. Tente novamente.");
-        setPlacing(false);
-        return;
-      }
-
-      // Get user email for payer info
+      // Step 2: Get user info for email + payment
       const { data: { user } } = await supabase.auth.getUser();
       const { data: profile } = await supabase.from("customers").select("full_name, email").eq("id", userId).single();
 
-      // Send order confirmation email (fire and forget)
+      // Step 3: Send order confirmation email (fire and forget)
       const fullAddress = `${address.address_street}, ${address.address_number}${address.address_complement ? ` - ${address.address_complement}` : ""} - ${address.address_neighborhood ? `${address.address_neighborhood}, ` : ""}${address.address_city}/${address.address_state} - CEP ${address.address_zip}`;
       fetch("/api/email", {
         method: "POST",
@@ -178,7 +152,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           type: "order_confirmation",
           data: {
-            orderId: order.id,
+            orderId,
             customerName: profile?.full_name || "",
             customerEmail: profile?.email || user?.email || "",
             items: items.map((item) => ({ product_name: item.name, quantity: item.quantity, price: item.price })),
@@ -190,18 +164,18 @@ export default function CheckoutPage() {
         }),
       }).catch((err) => console.error("Erro ao enviar email:", err));
 
-      // Create Mercado Pago preference
+      // Step 4: Create Mercado Pago preference
       const mpRes = await fetch("/api/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId: order.id,
+          orderId,
           items: items.map((item) => ({
             name: item.name,
             quantity: item.quantity,
             price: item.price,
           })),
-          shipping: shipping ? { price: shipping.price } : null,
+          shipping: { price: shipping.price },
           payer: { email: profile?.email || user?.email, name: profile?.full_name || "" },
         }),
       });
@@ -214,9 +188,9 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Fallback: go to order confirmation if MP didn't return checkout URL
+      // Fallback
       clearCart();
-      router.push(`/pedido-confirmado?id=${order.id}`);
+      router.push(`/pedido-confirmado?id=${orderId}`);
     } catch (err) {
       console.error("Checkout error:", err);
       setOrderError("Erro ao processar pedido. Tente novamente.");
