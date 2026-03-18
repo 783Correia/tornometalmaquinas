@@ -74,7 +74,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Erro ao salvar itens" }, { status: 500 });
     }
 
-    return NextResponse.json({ orderId: order.id });
+    // Get customer profile for payment/email
+    const { data: profile } = await supabase
+      .from("customers")
+      .select("full_name, email")
+      .eq("id", userId)
+      .single();
+
+    return NextResponse.json({
+      orderId: order.id,
+      customerName: profile?.full_name || "",
+      customerEmail: profile?.email || "",
+    });
   } catch (err) {
     console.error("Checkout API error:", err);
     return NextResponse.json({ error: "Erro interno" }, { status: 500 });

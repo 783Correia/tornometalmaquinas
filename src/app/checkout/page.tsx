@@ -139,12 +139,10 @@ export default function CheckoutPage() {
       }
 
       const orderId = checkoutData.orderId;
+      const customerName = checkoutData.customerName || "";
+      const customerEmail = checkoutData.customerEmail || "";
 
-      // Step 2: Get user info for email + payment
-      const { data: { user } } = await supabase.auth.getUser();
-      const { data: profile } = await supabase.from("customers").select("full_name, email").eq("id", userId).single();
-
-      // Step 3: Send order confirmation email (fire and forget)
+      // Step 2: Send order confirmation email (fire and forget)
       const fullAddress = `${address.address_street}, ${address.address_number}${address.address_complement ? ` - ${address.address_complement}` : ""} - ${address.address_neighborhood ? `${address.address_neighborhood}, ` : ""}${address.address_city}/${address.address_state} - CEP ${address.address_zip}`;
       fetch("/api/email", {
         method: "POST",
@@ -153,8 +151,8 @@ export default function CheckoutPage() {
           type: "order_confirmation",
           data: {
             orderId,
-            customerName: profile?.full_name || "",
-            customerEmail: profile?.email || user?.email || "",
+            customerName,
+            customerEmail,
             items: items.map((item) => ({ product_name: item.name, quantity: item.quantity, price: item.price })),
             total: totalPrice() + shipping.price,
             shippingCost: shipping.price,
@@ -164,7 +162,7 @@ export default function CheckoutPage() {
         }),
       }).catch((err) => console.error("Erro ao enviar email:", err));
 
-      // Step 4: Create Mercado Pago preference
+      // Step 3: Create Mercado Pago preference
       const mpRes = await fetch("/api/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -176,7 +174,7 @@ export default function CheckoutPage() {
             price: item.price,
           })),
           shipping: { price: shipping.price },
-          payer: { email: profile?.email || user?.email, name: profile?.full_name || "" },
+          payer: { email: customerEmail, name: customerName },
         }),
       });
 
@@ -213,19 +211,19 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Finalizar Compra</h1>
 
         {/* Steps */}
-        <div className="flex items-center justify-center sm:justify-between mb-8 gap-1 sm:gap-0">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6">
           {[
-            { n: 1, label: "Endereço", icon: <MapPin size={16} /> },
-            { n: 2, label: "Frete", icon: <Truck size={16} /> },
-            { n: 3, label: "Confirmação", icon: <CreditCard size={16} /> },
+            { n: 1, label: "Endereço", icon: <MapPin size={14} /> },
+            { n: 2, label: "Frete", icon: <Truck size={14} /> },
+            { n: 3, label: "Confirmação", icon: <CreditCard size={14} /> },
           ].map((s) => (
-            <div key={s.n} className="flex items-center gap-1 sm:gap-2 shrink-0">
-              <div className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition ${
+            <div key={s.n} className="flex items-center gap-2 sm:gap-3">
+              <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition ${
                 step >= s.n ? "bg-primary text-white" : "bg-white text-gray-400 border border-gray-200"
               }`}>
-                {step > s.n ? <CheckCircle size={16} /> : s.icon} <span className="hidden sm:inline">{s.label}</span><span className="sm:hidden">{s.n}</span>
+                {step > s.n ? <CheckCircle size={14} /> : s.icon} {s.label}
               </div>
-              {s.n < 3 && <div className={`w-4 sm:w-8 h-0.5 ${step > s.n ? "bg-primary" : "bg-gray-200"}`} />}
+              {s.n < 3 && <div className={`w-4 sm:w-6 h-0.5 ${step > s.n ? "bg-primary" : "bg-gray-200"}`} />}
             </div>
           ))}
         </div>
