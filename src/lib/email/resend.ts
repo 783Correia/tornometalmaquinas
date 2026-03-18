@@ -7,7 +7,7 @@ function getResend() {
 }
 
 const FROM_EMAIL = "TornoMetal <noreply@tornometalevertonlopes.com.br>";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "yuricorrea.ty@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "tornometal.maquina@hotmail.com";
 
 type OrderItem = {
   product_name: string;
