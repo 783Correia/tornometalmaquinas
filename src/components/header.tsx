@@ -43,7 +43,7 @@ export function Header() {
               alt="TornoMetal"
               width={56}
               height={56}
-              className="rounded-full"
+              className="rounded-lg"
               priority
             />
             <div className="hidden sm:block">

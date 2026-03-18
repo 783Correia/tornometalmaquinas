@@ -48,7 +48,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex flex-col w-60 bg-[#0d1b3e] text-white shrink-0">
         <div className="p-4 flex items-center gap-2 border-b border-white/10">
-          <Image src="/logo.png" alt="TornoMetal" width={40} height={40} className="rounded-full" />
+          <Image src="/logo.png" alt="TornoMetal" width={40} height={40} className="rounded-lg" />
           <div>
             <span className="font-bold text-sm">TORNOMETAL</span>
             <span className="text-[10px] text-blue-300/50 block -mt-0.5">Painel Admin</span>
@@ -74,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#0d1b3e] text-white h-14 flex items-center px-4 justify-between">
         <div className="flex items-center gap-2">
-          <Image src="/logo.png" alt="TornoMetal" width={32} height={32} className="rounded-full" />
+          <Image src="/logo.png" alt="TornoMetal" width={32} height={32} className="rounded-lg" />
           <span className="font-bold text-sm">ADMIN</span>
         </div>
         <button onClick={() => setSidebarOpen(!sidebarOpen)}>{sidebarOpen ? <X size={24} /> : <Menu size={24} />}</button>
