@@ -99,47 +99,57 @@ export default function CheckoutPage() {
     return address.address_zip && address.address_street && address.address_number && address.address_city && address.address_state;
   }
 
+  const [orderError, setOrderError] = useState("");
+
   async function handlePlaceOrder() {
     if (!shipping) return;
     setPlacing(true);
+    setOrderError("");
 
-    // Validate stock before placing order
-    for (const item of items) {
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock_quantity, manage_stock, name")
-        .eq("id", item.id)
-        .single();
+    try {
+      // Validate stock before placing order
+      for (const item of items) {
+        const { data: product } = await supabase
+          .from("products")
+          .select("stock_quantity, manage_stock, name")
+          .eq("id", item.id)
+          .single();
 
-      if (product?.manage_stock && product.stock_quantity < item.quantity) {
-        alert(`Produto "${product.name}" tem apenas ${product.stock_quantity} unidade(s) em estoque.`);
+        if (product?.manage_stock && product.stock_quantity < item.quantity) {
+          setOrderError(`Produto "${product.name}" tem apenas ${product.stock_quantity} unidade(s) em estoque.`);
+          setPlacing(false);
+          return;
+        }
+      }
+
+      // Save address to customer profile
+      await supabase.from("customers").update({
+        address_zip: address.address_zip, address_street: address.address_street,
+        address_number: address.address_number, address_complement: address.address_complement,
+        address_neighborhood: address.address_neighborhood, address_city: address.address_city,
+        address_state: address.address_state,
+      }).eq("id", userId);
+
+      // Create order
+      const { data: order, error: orderErr } = await supabase.from("orders").insert({
+        customer_id: userId,
+        status: "pending",
+        total: totalPrice() + shipping.price,
+        shipping_cost: shipping.price,
+        payment_method: null,
+        payment_status: "pending",
+        notes: `Frete: ${shipping.company} - ${shipping.name} (${shipping.delivery_time} dias)`,
+      }).select("id").single();
+
+      if (orderErr || !order) {
+        console.error("Order creation error:", orderErr);
+        setOrderError("Erro ao criar pedido. Tente novamente.");
         setPlacing(false);
         return;
       }
-    }
 
-    // Save address to customer profile
-    await supabase.from("customers").update({
-      address_zip: address.address_zip, address_street: address.address_street,
-      address_number: address.address_number, address_complement: address.address_complement,
-      address_neighborhood: address.address_neighborhood, address_city: address.address_city,
-      address_state: address.address_state,
-    }).eq("id", userId);
-
-    // Create order
-    const { data: order } = await supabase.from("orders").insert({
-      customer_id: userId,
-      status: "pending",
-      total: totalPrice() + shipping.price,
-      shipping_cost: shipping.price,
-      payment_method: null,
-      payment_status: "pending",
-      notes: `Frete: ${shipping.company} - ${shipping.name} (${shipping.delivery_time} dias)`,
-    }).select("id").single();
-
-    if (order) {
       // Create order items
-      await supabase.from("order_items").insert(
+      const { error: itemsErr } = await supabase.from("order_items").insert(
         items.map((item) => ({
           order_id: order.id,
           product_id: item.id,
@@ -149,11 +159,18 @@ export default function CheckoutPage() {
         }))
       );
 
+      if (itemsErr) {
+        console.error("Order items error:", itemsErr);
+        setOrderError("Erro ao salvar itens do pedido. Tente novamente.");
+        setPlacing(false);
+        return;
+      }
+
       // Get user email for payer info
       const { data: { user } } = await supabase.auth.getUser();
       const { data: profile } = await supabase.from("customers").select("full_name, email").eq("id", userId).single();
 
-      // Send order confirmation email
+      // Send order confirmation email (fire and forget)
       const fullAddress = `${address.address_street}, ${address.address_number}${address.address_complement ? ` - ${address.address_complement}` : ""} - ${address.address_neighborhood ? `${address.address_neighborhood}, ` : ""}${address.address_city}/${address.address_state} - CEP ${address.address_zip}`;
       fetch("/api/email", {
         method: "POST",
@@ -171,39 +188,38 @@ export default function CheckoutPage() {
             address: fullAddress,
           },
         }),
-      }).catch((err) => console.error("Erro ao enviar email de confirmação:", err));
+      }).catch((err) => console.error("Erro ao enviar email:", err));
 
       // Create Mercado Pago preference
-      try {
-        const mpRes = await fetch("/api/payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId: order.id,
-            items: items.map((item) => ({
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price,
-            })),
-            shipping: shipping ? { price: shipping.price } : null,
-            payer: { email: profile?.email || user?.email, name: profile?.full_name || "" },
-          }),
-        });
-        const mpData = await mpRes.json();
+      const mpRes = await fetch("/api/payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: order.id,
+          items: items.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          shipping: shipping ? { price: shipping.price } : null,
+          payer: { email: profile?.email || user?.email, name: profile?.full_name || "" },
+        }),
+      });
 
-        if (mpData.init_point) {
-          clearCart();
-          window.location.href = mpData.init_point;
-          return;
-        }
-      } catch (err) {
-        console.error("MP error:", err);
+      const mpData = await mpRes.json();
+
+      if (mpData.init_point) {
+        clearCart();
+        window.location.href = mpData.init_point;
+        return;
       }
 
-      // Fallback: go to order confirmation
+      // Fallback: go to order confirmation if MP didn't return checkout URL
       clearCart();
       router.push(`/pedido-confirmado?id=${order.id}`);
-    } else {
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setOrderError("Erro ao processar pedido. Tente novamente.");
       setPlacing(false);
     }
   }
@@ -370,6 +386,10 @@ export default function CheckoutPage() {
                     ))}
                   </div>
                 </div>
+
+                {orderError && (
+                  <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">{orderError}</div>
+                )}
 
                 <div className="flex gap-3 pt-2">
                   <button onClick={() => setStep(2)}
