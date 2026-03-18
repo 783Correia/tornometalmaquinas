@@ -38,7 +38,11 @@ export default function CadastroPage() {
     if (form.password.length < 6) { setError("A senha deve ter pelo menos 6 caracteres."); return; }
     setLoading(true);
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({ email: form.email, password: form.password });
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: form.email,
+      password: form.password,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
     if (authError || !authData.user) { setError(authError?.message || "Erro ao criar conta."); setLoading(false); return; }
 
     await supabase.from("customers").insert({
