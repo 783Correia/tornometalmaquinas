@@ -14,8 +14,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 function verifyWebhookSignature(req: NextRequest, body: string): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
   if (!secret) {
-    console.warn("⚠️ MP_WEBHOOK_SECRET not configured - webhook signature verification skipped");
-    return true;
+    console.error("❌ MP_WEBHOOK_SECRET not configured - rejecting webhook");
+    return false;
   }
 
   const xSignature = req.headers.get("x-signature");
@@ -64,19 +64,31 @@ export async function POST(req: NextRequest) {
           status,
         }).eq("id", orderId);
 
-        // On payment approval: decrement stock + send email
+        // On payment approval: decrement stock + send email (only if not already processed)
         if (paymentData.status === "approved") {
+          // Check if already processed to prevent duplicate stock decrements
+          const { data: existingOrder } = await supabase
+            .from("orders")
+            .select("status")
+            .eq("id", orderId)
+            .single();
+
+          const alreadyProcessed = existingOrder?.status === "processing";
+
           const { data: orderItems } = await supabase
             .from("order_items")
             .select("product_id, product_name, quantity, price")
             .eq("order_id", orderId);
 
-          if (orderItems) {
+          if (orderItems && !alreadyProcessed) {
             for (const item of orderItems) {
-              await supabase.rpc("decrement_stock", {
+              const { error: stockError } = await supabase.rpc("decrement_stock", {
                 p_product_id: item.product_id,
                 p_quantity: item.quantity,
               });
+              if (stockError) {
+                console.error(`Stock decrement failed for product ${item.product_id}:`, stockError);
+              }
             }
           }
 

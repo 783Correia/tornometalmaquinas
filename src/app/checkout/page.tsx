@@ -84,7 +84,9 @@ export default function CheckoutPage() {
           address_zip: clean,
         }));
       }
-    } catch {}
+    } catch (err) {
+      console.error("Erro ao buscar CEP:", err);
+    }
     setCepLoading(false);
   }
 

@@ -20,6 +20,21 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Verify order exists and belongs to the payer
+    const { data: order } = await supabase
+      .from("orders")
+      .select("id, customer_id, status")
+      .eq("id", orderId)
+      .single();
+
+    if (!order) {
+      return NextResponse.json({ error: "Pedido não encontrado" }, { status: 404 });
+    }
+
+    if (order.status !== "pending") {
+      return NextResponse.json({ error: "Pedido já processado" }, { status: 409 });
+    }
+
     // Server-side stock verification before creating payment
     const { data: orderItems } = await supabase
       .from("order_items")

@@ -31,6 +31,10 @@ function formatCurrency(value: number) {
   return `R$ ${value.toFixed(2).replace(".", ",")}`;
 }
 
+function escapeHtml(str: string) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function itemsTable(items: OrderItem[]) {
   return items
     .map(
@@ -180,13 +184,13 @@ export async function sendContactMessage(data: { name: string; email: string; me
     <h2 style="color:#333;margin-top:0">Nova mensagem de contato</h2>
 
     <div style="background:#f8f9fa;border-radius:8px;padding:16px;margin:16px 0">
-      <p style="margin:0 0 4px;color:#666;font-size:13px"><strong>Nome:</strong> ${data.name}</p>
-      <p style="margin:0 0 4px;color:#666;font-size:13px"><strong>E-mail:</strong> ${data.email}</p>
+      <p style="margin:0 0 4px;color:#666;font-size:13px"><strong>Nome:</strong> ${escapeHtml(data.name)}</p>
+      <p style="margin:0 0 4px;color:#666;font-size:13px"><strong>E-mail:</strong> ${escapeHtml(data.email)}</p>
     </div>
 
     <div style="background:#f8f9fa;border-radius:8px;padding:16px;margin:16px 0">
       <p style="margin:0 0 4px;font-weight:bold;color:#333;font-size:13px">Mensagem:</p>
-      <p style="margin:0;color:#666;font-size:13px;white-space:pre-wrap">${data.message}</p>
+      <p style="margin:0;color:#666;font-size:13px;white-space:pre-wrap">${escapeHtml(data.message)}</p>
     </div>
 
     <p style="color:#666;font-size:13px">Responda diretamente para: <a href="mailto:${data.email}" style="color:#0264A5">${data.email}</a></p>
