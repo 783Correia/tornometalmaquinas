@@ -173,7 +173,7 @@ export default async function LojaPage({ searchParams }: Props) {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex justify-center gap-2 mt-8">
+                  <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mt-8">
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
                       const qs = new URLSearchParams();
                       if (params.categoria) qs.set("categoria", params.categoria);
@@ -188,7 +188,7 @@ export default async function LojaPage({ searchParams }: Props) {
                         <a
                           key={p}
                           href={`/loja?${qs.toString()}`}
-                          className={`px-3.5 py-2 rounded-lg text-sm font-medium transition ${
+                          className={`px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${
                             p === page
                               ? "bg-primary text-white"
                               : "bg-white border border-gray-200 text-gray-600 hover:border-primary hover:text-primary"

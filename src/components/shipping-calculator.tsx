@@ -88,7 +88,7 @@ export function ShippingCalculator({ products, onSelect }: Props) {
         <button
           onClick={calculate}
           disabled={loading}
-          className="bg-primary text-white px-3 sm:px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center gap-2 shrink-0"
+          className="bg-primary text-white px-3 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center gap-1.5 sm:gap-2 shrink-0 whitespace-nowrap"
         >
           {loading ? <Loader2 size={16} className="animate-spin" /> : null}
           {loading ? "Calculando..." : "Calcular"}

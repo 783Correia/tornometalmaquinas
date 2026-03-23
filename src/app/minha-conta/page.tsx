@@ -93,7 +93,7 @@ export default function MinhaContaPage() {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {tabs.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition ${
                 tab === t.id ? "bg-primary text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200 hover:border-primary hover:text-primary"
               }`}>
               {t.icon} {t.label}

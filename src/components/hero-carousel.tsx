@@ -110,16 +110,16 @@ export function HeroCarousel() {
                 <div
                   className={`w-full max-w-7xl mx-auto flex ${
                     slide.textPosition === "center"
-                      ? "justify-center px-6"
+                      ? "justify-center px-4 sm:px-6"
                       : slide.textPosition === "right-center"
-                        ? "justify-end px-6 sm:px-10 md:px-16 lg:pr-[12%]"
+                        ? "justify-end px-4 sm:px-10 md:px-16 lg:pr-[12%]"
                         : slide.textPosition === "left-inset"
-                          ? "justify-start px-10 sm:px-14 md:px-24 lg:px-32"
-                          : "justify-start px-6 sm:px-10 md:px-16 lg:px-20"
+                          ? "justify-start px-4 sm:px-14 md:px-24 lg:px-32"
+                          : "justify-start px-4 sm:px-10 md:px-16 lg:px-20"
                   }`}
                 >
                   <div
-                    className={`max-w-[260px] sm:max-w-xs md:max-w-md lg:max-w-lg ${
+                    className={`max-w-[85vw] sm:max-w-xs md:max-w-md lg:max-w-lg ${
                       slide.textPosition === "center" ? "text-center" : ""
                     }`}
                   >
@@ -176,12 +176,12 @@ export function HeroCarousel() {
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-2.5 sm:gap-2">
         {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all ${
+            className={`w-3 h-3 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full transition-all ${
               i === current
                 ? "bg-white scale-110 shadow-md"
                 : "bg-white/50 hover:bg-white/70"

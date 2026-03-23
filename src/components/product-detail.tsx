@@ -56,15 +56,15 @@ export function ProductDetail({ product, related }: { product: Product; related:
                 )}
               </div>
               {images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-1">
+                <div className="flex gap-2 overflow-x-auto pb-1 px-1">
                   {images.map((img, i) => (
                     <button
                       key={img.id}
                       onClick={() => setSelectedImage(i)}
-                      className={`w-18 h-18 sm:w-16 sm:h-16 relative rounded-lg overflow-hidden shrink-0 border-2 transition ${
+                      className={`w-16 h-16 sm:w-18 sm:h-18 relative rounded-lg overflow-hidden shrink-0 border-2 transition ${
                         i === selectedImage ? "border-primary" : "border-gray-200 hover:border-gray-300"
                       }`}
-                      style={{ minWidth: 64, minHeight: 64 }}
+                      style={{ minWidth: 56, minHeight: 56 }}
                     >
                       <Image src={img.src} alt="" fill className="object-contain" sizes="72px" />
                     </button>
@@ -113,7 +113,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
                 )}
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mb-6">
                 <div className="flex items-center justify-center border-2 border-gray-200 rounded-xl">
                   <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3.5 text-gray-500 hover:text-primary transition">
                     <Minus size={18} />

@@ -211,19 +211,19 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Finalizar Compra</h1>
 
         {/* Steps */}
-        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-3 mb-6">
           {[
             { n: 1, label: "Endereço", icon: <MapPin size={14} /> },
             { n: 2, label: "Frete", icon: <Truck size={14} /> },
             { n: 3, label: "Confirmação", icon: <CreditCard size={14} /> },
           ].map((s) => (
-            <div key={s.n} className="flex items-center gap-2 sm:gap-3">
-              <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition ${
+            <div key={s.n} className="flex items-center gap-1.5 sm:gap-3">
+              <div className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl text-[11px] sm:text-sm font-medium whitespace-nowrap transition ${
                 step >= s.n ? "bg-primary text-white" : "bg-white text-gray-400 border border-gray-200"
               }`}>
                 {step > s.n ? <CheckCircle size={14} /> : s.icon} {s.label}
               </div>
-              {s.n < 3 && <div className={`w-4 sm:w-6 h-0.5 ${step > s.n ? "bg-primary" : "bg-gray-200"}`} />}
+              {s.n < 3 && <div className={`w-3 sm:w-6 h-0.5 ${step > s.n ? "bg-primary" : "bg-gray-200"}`} />}
             </div>
           ))}
         </div>

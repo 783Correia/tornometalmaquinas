@@ -37,7 +37,7 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
         {/* Left arrow */}
         <button
           onClick={() => scroll("left")}
-          className="absolute left-1 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-md border border-gray-200 text-primary p-2.5 md:p-2.5 rounded-full hover:scale-110 transition-all"
+          className="absolute left-0.5 sm:left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-md border border-gray-200 text-primary p-2 sm:p-2.5 rounded-full hover:scale-110 transition-all"
           aria-label="Anterior"
         >
           <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
@@ -46,7 +46,7 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
         {/* Scrollable container */}
         <div
           ref={scrollRef}
-          className="flex gap-5 md:gap-7 overflow-x-auto px-6 md:px-12 py-3"
+          className="flex gap-3 sm:gap-5 md:gap-7 overflow-x-auto px-8 sm:px-10 md:px-12 py-3"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
         >
           {categories.map((cat) => (
@@ -80,7 +80,7 @@ export function CategoryCarousel({ categories }: { categories: CategoryWithImage
         {/* Right arrow */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-1 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-md border border-gray-200 text-primary p-2.5 md:p-2.5 rounded-full hover:scale-110 transition-all"
+          className="absolute right-0.5 sm:right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 shadow-md border border-gray-200 text-primary p-2 sm:p-2.5 rounded-full hover:scale-110 transition-all"
           aria-label="Próximo"
         >
           <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />

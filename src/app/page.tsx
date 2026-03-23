@@ -71,7 +71,7 @@ export default async function Home() {
 
       {/* Diferenciais */}
       <section className="py-8 md:py-14 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           {[
             { icon: Wrench, title: "Fabricação Própria", desc: "Peças fabricadas com precisão milimétrica" },
             { icon: Truck, title: "Envio Nacional", desc: "Entregamos em todo o Brasil" },
@@ -82,8 +82,8 @@ export default async function Home() {
               key={item.title}
               className="text-center p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-primary/20 transition-all"
             >
-              <div className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3 bg-blue-50 rounded-lg md:rounded-xl flex items-center justify-center">
-                <item.icon className="text-primary w-5 h-5 md:w-6 md:h-6" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3 bg-blue-50 rounded-lg md:rounded-xl flex items-center justify-center">
+                <item.icon className="text-primary w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               </div>
               <h3 className="font-semibold text-xs md:text-sm text-gray-900 mb-0.5 md:mb-1">{item.title}</h3>
               <p className="text-[10px] md:text-xs text-gray-500 hidden sm:block">{item.desc}</p>

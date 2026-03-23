@@ -39,7 +39,7 @@ export default function ContatoPage() {
           <p className="text-gray-500">Entre em contato para tirar dúvidas ou fazer orçamentos</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-8">
           <div className="space-y-4">
             {[
               { icon: Phone, title: "Telefone / WhatsApp", desc: "(54) 3315-3969" },
