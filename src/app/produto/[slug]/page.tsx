@@ -13,15 +13,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const { data: product } = await supabase
     .from("products")
-    .select("name, short_description")
+    .select("name, short_description, brands(name), categories(name), product_images(src)")
     .eq("slug", slug)
     .single();
 
   if (!product) return { title: "Produto não encontrado" };
 
+  const title = product.name;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const brandName = (product.brands as any)?.name;
+  const description = product.short_description
+    || `${product.name}${brandName ? ` - ${brandName}` : ""}. Peça para plantadeira com envio para todo o Brasil. TornoMetal Everton Lopes.`;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const image = (product.product_images as any)?.[0]?.src;
+  const url = `https://tornometalevertonlopes.com.br/produto/${slug}`;
+
   return {
-    title: `${product.name} | TornoMetal`,
-    description: product.short_description || product.name,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      images: image ? [{ url: image, alt: title }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }
 
@@ -72,9 +95,38 @@ export default async function ProductPage({ params }: Props) {
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Início", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Loja", item: `${siteUrl}/loja` },
+      ...(product.categories ? [{ "@type": "ListItem", position: 3, name: product.categories.name, item: `${siteUrl}/loja?categoria=${product.categories.slug}` }] : []),
+      { "@type": "ListItem", position: product.categories ? 4 : 3, name: product.name, item: `${siteUrl}/produto/${product.slug}` },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <div className="max-w-7xl mx-auto px-4 pt-4">
+        <nav aria-label="Breadcrumb" className="text-sm text-gray-500">
+          <ol className="flex items-center gap-1.5 flex-wrap">
+            <li><a href="/" className="hover:text-primary transition">Início</a></li>
+            <li>/</li>
+            <li><a href="/loja" className="hover:text-primary transition">Loja</a></li>
+            {product.categories && (
+              <>
+                <li>/</li>
+                <li><a href={`/loja?categoria=${product.categories.slug}`} className="hover:text-primary transition">{product.categories.name}</a></li>
+              </>
+            )}
+            <li>/</li>
+            <li className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</li>
+          </ol>
+        </nav>
+      </div>
       <ProductDetail product={product} related={related || []} />
     </>
   );

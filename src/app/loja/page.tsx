@@ -1,8 +1,21 @@
 import { supabase } from "@/lib/supabase";
 import { ProductCard } from "@/components/product-card";
 import { FilterSidebar } from "@/components/filter-sidebar";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Loja - Peças para Plantadeiras",
+  description:
+    "Compre peças para plantadeiras online. Condutores, dosadores, telescópios, engrenagens e mais. Semeato, John Deere, Massey, Imasa, Jumil. Entrega para todo o Brasil.",
+  alternates: { canonical: "https://tornometalevertonlopes.com.br/loja" },
+  openGraph: {
+    title: "Loja TornoMetal - Peças para Plantadeiras",
+    description: "Catálogo completo de peças para plantadeiras. Mais de 160 produtos disponíveis.",
+    url: "https://tornometalevertonlopes.com.br/loja",
+  },
+};
 
 type Props = {
   searchParams: Promise<{
@@ -73,9 +86,58 @@ export default async function LojaPage({ searchParams }: Props) {
   const { data: categories } = await supabase.from("categories").select("*").order("name");
   const { data: brands } = await supabase.from("brands").select("*").order("name");
 
+  const siteUrl = "https://tornometalevertonlopes.com.br";
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Peças para Plantadeiras - TornoMetal",
+    description: "Catálogo completo de peças para plantadeiras",
+    url: `${siteUrl}/loja`,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: count || 0,
+      itemListElement: (products || []).map((p, i) => ({
+        "@type": "ListItem",
+        position: offset + i + 1,
+        url: `${siteUrl}/produto/${p.slug}`,
+        name: p.name,
+      })),
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Início", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Loja", item: `${siteUrl}/loja` },
+      ...(params.categoria ? [{ "@type": "ListItem", position: 3, name: params.categoria, item: `${siteUrl}/loja?categoria=${params.categoria}` }] : []),
+      ...(params.marca ? [{ "@type": "ListItem", position: 3, name: params.marca, item: `${siteUrl}/loja?marca=${params.marca}` }] : []),
+    ],
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <nav aria-label="Breadcrumb" className="mb-4 text-sm text-gray-500">
+          <ol className="flex items-center gap-1.5">
+            <li><a href="/" className="hover:text-primary transition">Início</a></li>
+            <li>/</li>
+            {params.categoria || params.marca ? (
+              <>
+                <li><a href="/loja" className="hover:text-primary transition">Loja</a></li>
+                <li>/</li>
+                <li className="text-gray-900 font-medium">{params.categoria || params.marca}</li>
+              </>
+            ) : (
+              <li className="text-gray-900 font-medium">Loja</li>
+            )}
+          </ol>
+        </nav>
+
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">
             {params.busca
