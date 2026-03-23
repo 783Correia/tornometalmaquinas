@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -10,18 +10,32 @@ export async function GET(request: NextRequest) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br";
 
   if (token_hash && type) {
-    const supabase = createClient(
+    const response = NextResponse.redirect(new URL(next, siteUrl));
+
+    const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options);
+            });
+          },
+        },
+      }
     );
 
     const { error } = await supabase.auth.verifyOtp({ token_hash, type: type as any });
 
     if (!error) {
-      return NextResponse.redirect(new URL(next, siteUrl));
+      return response;
     }
   }
 
   // If verification fails or no token, redirect to login
-  return NextResponse.redirect(new URL("/login", siteUrl));
+  return NextResponse.redirect(new URL("/login?error=link_expirado", siteUrl));
 }

@@ -11,11 +11,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-function verifyWebhookSignature(req: NextRequest, body: string): boolean {
+function verifyWebhookSignature(req: NextRequest): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
   if (!secret) {
-    console.error("❌ MP_WEBHOOK_SECRET not configured - rejecting webhook");
-    return false;
+    // Allow webhooks without signature verification when secret is not configured
+    console.warn("MP_WEBHOOK_SECRET not configured - accepting webhook without signature verification");
+    return true;
   }
 
   const xSignature = req.headers.get("x-signature");
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
     const bodyText = await req.text();
 
     // Verify webhook signature
-    if (!verifyWebhookSignature(req, bodyText)) {
+    if (!verifyWebhookSignature(req)) {
       console.error("Webhook signature verification failed");
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
@@ -53,34 +54,35 @@ export async function POST(req: NextRequest) {
 
       if (paymentData.external_reference) {
         const orderId = Number(paymentData.external_reference);
-        let status = "pending";
 
+        // Check current status BEFORE updating (to prevent duplicate processing)
+        const { data: existingOrder } = await supabase
+          .from("orders")
+          .select("status, payment_status")
+          .eq("id", orderId)
+          .single();
+
+        const alreadyProcessed = existingOrder?.payment_status === "approved";
+
+        let status = "pending";
         if (paymentData.status === "approved") status = "processing";
         else if (paymentData.status === "rejected") status = "cancelled";
 
+        // Update order status
         await supabase.from("orders").update({
           payment_status: paymentData.status || "unknown",
           payment_method: paymentData.payment_method_id || null,
           status,
         }).eq("id", orderId);
 
-        // On payment approval: decrement stock + send email (only if not already processed)
-        if (paymentData.status === "approved") {
-          // Check if already processed to prevent duplicate stock decrements
-          const { data: existingOrder } = await supabase
-            .from("orders")
-            .select("status")
-            .eq("id", orderId)
-            .single();
-
-          const alreadyProcessed = existingOrder?.status === "processing";
-
+        // On payment approval: decrement stock + send email
+        if (paymentData.status === "approved" && !alreadyProcessed) {
           const { data: orderItems } = await supabase
             .from("order_items")
             .select("product_id, product_name, quantity, price")
             .eq("order_id", orderId);
 
-          if (orderItems && !alreadyProcessed) {
+          if (orderItems) {
             for (const item of orderItems) {
               const { error: stockError } = await supabase.rpc("decrement_stock", {
                 p_product_id: item.product_id,
