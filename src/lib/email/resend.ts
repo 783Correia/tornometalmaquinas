@@ -210,7 +210,45 @@ export async function sendContactMessage(data: { name: string; email: string; me
   }
 }
 
-// Email 5: New order notification for admin
+// Email 5: Welcome email for new registration
+export async function sendWelcomeEmail(data: { customerName: string; customerEmail: string }) {
+  const html = emailLayout(`
+    <h2 style="color:#333;margin-top:0">Bem-vindo à TornoMetal!</h2>
+    <p style="color:#666">Olá <strong>${escapeHtml(data.customerName)}</strong>, sua conta foi criada com sucesso!</p>
+
+    <div style="background:#e8f5e9;border-radius:8px;padding:16px;margin:16px 0;text-align:center">
+      <p style="margin:0;color:#2e7d32;font-size:16px;font-weight:bold">Cadastro confirmado</p>
+      <p style="margin:4px 0 0;color:#4caf50">Você já pode fazer suas compras</p>
+    </div>
+
+    <p style="color:#666">Agora você pode:</p>
+    <ul style="color:#666;padding-left:20px">
+      <li>Navegar por nosso catálogo de peças para plantadeiras</li>
+      <li>Adicionar produtos ao carrinho e finalizar compras</li>
+      <li>Acompanhar seus pedidos na sua conta</li>
+    </ul>
+
+    <a href="https://tornometalevertonlopes.com.br"
+       style="display:inline-block;background:#0264A5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:8px">
+      Começar a comprar
+    </a>
+
+    <p style="color:#999;font-size:12px;margin-top:24px">Se você não criou esta conta, por favor ignore este e-mail.</p>
+  `);
+
+  try {
+    await getResend().emails.send({
+      from: FROM_EMAIL,
+      to: data.customerEmail,
+      subject: "Bem-vindo à TornoMetal! Sua conta foi criada",
+      html,
+    });
+  } catch (err) {
+    console.error("Error sending welcome email:", err);
+  }
+}
+
+// Email 6: New order notification for admin
 export async function sendAdminNewOrder(data: OrderEmailData) {
   const html = emailLayout(`
     <h2 style="color:#333;margin-top:0">Novo pedido recebido!</h2>

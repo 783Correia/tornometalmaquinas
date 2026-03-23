@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { UserPlus, Eye, EyeOff } from "lucide-react";
+import { UserPlus, Eye, EyeOff, CheckCircle } from "lucide-react";
 
 export default function CadastroPage() {
   const [form, setForm] = useState({ full_name: "", email: "", phone: "", cpf: "", cnpj: "", inscricao_estadual: "", password: "", confirmPassword: "" });
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   function update(field: string, value: string) { setForm((prev) => ({ ...prev, [field]: value })); }
@@ -38,20 +39,67 @@ export default function CadastroPage() {
     if (form.password.length < 6) { setError("A senha deve ter pelo menos 6 caracteres."); return; }
     setLoading(true);
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    });
-    if (authError || !authData.user) { setError(authError?.message || "Erro ao criar conta."); setLoading(false); return; }
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          full_name: form.full_name,
+          phone: form.phone,
+          cpf: form.cpf,
+          cnpj: form.cnpj,
+          inscricao_estadual: form.inscricao_estadual,
+        }),
+      });
 
-    await supabase.from("customers").insert({
-      id: authData.user.id, full_name: form.full_name, email: form.email,
-      phone: form.phone.replace(/\D/g, ""), cpf: form.cpf.replace(/\D/g, ""),
-      cnpj: form.cnpj.replace(/\D/g, "") || null, inscricao_estadual: form.inscricao_estadual || null,
-    });
+      const data = await res.json();
 
-    router.push("/minha-conta");
+      if (!res.ok) {
+        setError(data.error || "Erro ao criar conta. Tente novamente.");
+        setLoading(false);
+        return;
+      }
+
+      // Auto-login after registration
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      });
+
+      if (loginError) {
+        // Account created but auto-login failed - redirect to login
+        setSuccess(true);
+        setLoading(false);
+        setTimeout(() => router.push("/login"), 3000);
+        return;
+      }
+
+      setSuccess(true);
+      setLoading(false);
+      setTimeout(() => router.push("/minha-conta"), 2000);
+    } catch {
+      setError("Erro de conexão. Verifique sua internet e tente novamente.");
+      setLoading(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-gray-50">
+        <div className="w-full max-w-md text-center">
+          <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="text-white" size={32} />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Conta criada com sucesso!</h1>
+          <p className="text-gray-500 mb-6">Bem-vindo à TornoMetal. Você será redirecionado em instantes...</p>
+          <Link href="/minha-conta" className="text-primary font-medium hover:underline">
+            Ir para Minha Conta
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { sendOrderConfirmation, sendAdminNewOrder, sendPaymentApproved, sendShippingNotification, sendContactMessage } from "@/lib/email/resend";
+import { sendOrderConfirmation, sendAdminNewOrder, sendPaymentApproved, sendShippingNotification, sendContactMessage, sendWelcomeEmail } from "@/lib/email/resend";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
