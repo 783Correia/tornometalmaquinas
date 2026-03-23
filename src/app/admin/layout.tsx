@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-import { LayoutDashboard, Package, FolderOpen, Tags, Users, ShoppingBag, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Package, FolderOpen, Tags, Users, ShoppingBag, LogOut, Menu, X, AlertTriangle } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -19,13 +19,25 @@ const navItems = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [authorized, setAuthorized] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [lowStockCount, setLowStockCount] = useState(0);
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
     if (pathname === "/admin/login") { setAuthorized(true); return; }
     checkAdmin();
+    loadAlerts();
   }, [pathname]);
+
+  async function loadAlerts() {
+    const [stock, pending] = await Promise.all([
+      supabase.from("products").select("id", { count: "exact", head: true }).lte("stock_quantity", 5),
+      supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "pending"),
+    ]);
+    setLowStockCount(stock.count || 0);
+    setPendingOrdersCount(pending.count || 0);
+  }
 
   async function checkAdmin() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -55,14 +67,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
         <nav className="flex-1 p-3 space-y-1">
-          {navItems.map((item) => (
-            <Link key={item.href} href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition ${
-                pathname === item.href ? "bg-white/10 text-white font-medium" : "text-white/60 hover:text-white hover:bg-white/5"
-              }`}>
-              <item.icon size={18} /> {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const badge = item.href === "/admin/produtos" && lowStockCount > 0 ? lowStockCount
+              : item.href === "/admin/pedidos" && pendingOrdersCount > 0 ? pendingOrdersCount
+              : 0;
+            return (
+              <Link key={item.href} href={item.href}
+                className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition ${
+                  pathname === item.href ? "bg-white/10 text-white font-medium" : "text-white/60 hover:text-white hover:bg-white/5"
+                }`}>
+                <span className="flex items-center gap-3"><item.icon size={18} /> {item.label}</span>
+                {badge > 0 && (
+                  <span className="bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                    {badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
         <div className="p-3 border-t border-white/10">
           <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/60 hover:text-red-400 transition w-full">
@@ -85,14 +107,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setSidebarOpen(false)}>
           <aside className="w-60 h-full bg-[#0d1b3e] text-white pt-14" onClick={(e) => e.stopPropagation()}>
             <nav className="p-3 space-y-1">
-              {navItems.map((item) => (
-                <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition ${
-                    pathname === item.href ? "bg-white/10 text-white font-medium" : "text-white/60 hover:text-white"
-                  }`}>
-                  <item.icon size={18} /> {item.label}
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                const badge = item.href === "/admin/produtos" && lowStockCount > 0 ? lowStockCount
+                  : item.href === "/admin/pedidos" && pendingOrdersCount > 0 ? pendingOrdersCount
+                  : 0;
+                return (
+                  <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition ${
+                      pathname === item.href ? "bg-white/10 text-white font-medium" : "text-white/60 hover:text-white"
+                    }`}>
+                    <span className="flex items-center gap-3"><item.icon size={18} /> {item.label}</span>
+                    {badge > 0 && (
+                      <span className="bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                        {badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
             </nav>
             <div className="p-3 border-t border-white/10">
               <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/60 hover:text-red-400 w-full">

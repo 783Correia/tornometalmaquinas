@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Search, ChevronDown, ChevronUp, Truck, Save } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, Truck, Filter, CheckSquare, Square } from "lucide-react";
 
 type Order = {
   id: number;
@@ -27,10 +27,22 @@ const statusLabels: Record<string, { label: string; color: string }> = {
   cancelled: { label: "Cancelado", color: "bg-red-100 text-red-700" },
 };
 
+const paymentLabels: Record<string, { label: string; color: string }> = {
+  approved: { label: "Aprovado", color: "bg-green-100 text-green-700" },
+  pending: { label: "Pendente", color: "bg-yellow-100 text-yellow-700" },
+  rejected: { label: "Rejeitado", color: "bg-red-100 text-red-700" },
+  in_process: { label: "Em análise", color: "bg-blue-100 text-blue-700" },
+};
+
+type StatusFilter = "all" | "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+
 export default function AdminPedidos() {
   const [items, setItems] = useState<Order[]>([]);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState("");
 
   useEffect(() => { load(); }, []);
 
@@ -50,7 +62,6 @@ export default function AdminPedidos() {
   async function updateTracking(id: number, code: string) {
     await supabase.from("orders").update({ tracking_code: code }).eq("id", id);
 
-    // Send shipping email if tracking code was added
     if (code) {
       const order = items.find((o) => o.id === id);
       if (order?.customers) {
@@ -73,15 +84,51 @@ export default function AdminPedidos() {
         }).catch((err) => console.error("Erro ao enviar email de rastreio:", err));
       }
     }
-
     load();
   }
 
-  const filtered = items.filter((o) =>
-    o.id.toString().includes(search) ||
-    o.customers?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    o.customers?.email?.toLowerCase().includes(search.toLowerCase())
-  );
+  async function handleBulkUpdate() {
+    if (!bulkStatus || selectedIds.size === 0) return;
+    if (!confirm(`Alterar ${selectedIds.size} pedido(s) para "${statusLabels[bulkStatus]?.label}"?`)) return;
+    for (const id of selectedIds) {
+      await supabase.from("orders").update({ status: bulkStatus }).eq("id", id);
+    }
+    setSelectedIds(new Set());
+    setBulkStatus("");
+    load();
+  }
+
+  function toggleSelect(id: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((o) => o.id)));
+    }
+  }
+
+  const filtered = items.filter((o) => {
+    const matchSearch = !search ||
+      o.id.toString().includes(search) ||
+      o.customers?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+      o.customers?.email?.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || o.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
+
+  const statusCounts = items.reduce((acc, o) => {
+    acc[o.status] = (acc[o.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const fmt = (v: number) => `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
 
   return (
     <div>
@@ -89,40 +136,100 @@ export default function AdminPedidos() {
         <h1 className="text-2xl font-bold text-gray-900">Pedidos ({items.length})</h1>
       </div>
 
-      <div className="relative mb-4 max-w-md">
-        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-        <input type="text" placeholder="Buscar por nº, nome ou email..."
-          value={search} onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm outline-none focus:border-primary transition" />
+      {/* Status filter tabs */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {[
+          { key: "all" as StatusFilter, label: "Todos", count: items.length },
+          { key: "pending" as StatusFilter, label: "Pendentes", count: statusCounts.pending || 0 },
+          { key: "processing" as StatusFilter, label: "Processando", count: statusCounts.processing || 0 },
+          { key: "shipped" as StatusFilter, label: "Enviados", count: statusCounts.shipped || 0 },
+          { key: "delivered" as StatusFilter, label: "Entregues", count: statusCounts.delivered || 0 },
+          { key: "cancelled" as StatusFilter, label: "Cancelados", count: statusCounts.cancelled || 0 },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => { setStatusFilter(tab.key); setSelectedIds(new Set()); }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+              statusFilter === tab.key
+                ? "bg-primary text-white"
+                : "bg-white text-gray-600 border border-gray-200 hover:border-primary/30"
+            }`}
+          >
+            {tab.label} ({tab.count})
+          </button>
+        ))}
+      </div>
+
+      {/* Search + bulk actions */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input type="text" placeholder="Buscar por nº, nome ou email..."
+            value={search} onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-xl text-sm outline-none focus:border-primary transition" />
+        </div>
+
+        {selectedIds.size > 0 && (
+          <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
+            <Filter size={14} className="text-blue-500" />
+            <span className="text-sm text-blue-700 font-medium">{selectedIds.size} selecionado(s)</span>
+            <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)}
+              className="border border-blue-200 rounded-lg px-2 py-1 text-sm outline-none">
+              <option value="">Alterar status...</option>
+              <option value="pending">Pendente</option>
+              <option value="processing">Processando</option>
+              <option value="shipped">Enviado</option>
+              <option value="delivered">Entregue</option>
+              <option value="cancelled">Cancelado</option>
+            </select>
+            <button onClick={handleBulkUpdate} disabled={!bulkStatus}
+              className="bg-primary text-white px-3 py-1 rounded-lg text-sm font-medium hover:bg-primary-dark transition disabled:opacity-50">
+              Aplicar
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="space-y-3">
+        {/* Select all */}
+        {filtered.length > 0 && (
+          <button onClick={toggleSelectAll} className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary transition px-1">
+            {selectedIds.size === filtered.length ? <CheckSquare size={16} /> : <Square size={16} />}
+            {selectedIds.size === filtered.length ? "Desmarcar todos" : "Selecionar todos"}
+          </button>
+        )}
+
         {filtered.map((order) => {
           const st = statusLabels[order.status] || statusLabels.pending;
+          const ps = paymentLabels[order.payment_status || ""] || null;
           const isOpen = expanded === order.id;
+          const isSelected = selectedIds.has(order.id);
+
           return (
-            <div key={order.id} className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-gray-50"
-                onClick={() => setExpanded(isOpen ? null : order.id)}>
-                <div className="flex items-center gap-4">
-                  <span className="font-bold text-gray-900">#{order.id}</span>
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span>
-                  <span className="text-sm text-gray-500">{order.customers?.full_name || "—"}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold text-gray-900">
-                    R$ {Number(order.total).toFixed(2).replace(".", ",")}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {new Date(order.created_at).toLocaleDateString("pt-BR")}
-                  </span>
-                  {isOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+            <div key={order.id} className={`bg-white border rounded-2xl shadow-sm overflow-hidden transition ${isSelected ? "border-primary/40 ring-1 ring-primary/20" : "border-gray-200"}`}>
+              <div className="flex items-center px-5 py-4">
+                <button onClick={(e) => { e.stopPropagation(); toggleSelect(order.id); }} className="mr-3 text-gray-400 hover:text-primary transition">
+                  {isSelected ? <CheckSquare size={18} className="text-primary" /> : <Square size={18} />}
+                </button>
+                <div className="flex-1 flex items-center justify-between cursor-pointer hover:opacity-80"
+                  onClick={() => setExpanded(isOpen ? null : order.id)}>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-bold text-gray-900">#{order.id}</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span>
+                    {ps && <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${ps.color}`}>{ps.label}</span>}
+                    <span className="text-sm text-gray-500">{order.customers?.full_name || "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold text-gray-900">{fmt(order.total)}</span>
+                    <span className="text-xs text-gray-400">{new Date(order.created_at).toLocaleDateString("pt-BR")}</span>
+                    {isOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+                  </div>
                 </div>
               </div>
 
               {isOpen && (
                 <div className="border-t border-gray-100 px-5 py-4 space-y-4">
-                  <div className="grid md:grid-cols-3 gap-4 text-sm">
+                  <div className="grid md:grid-cols-4 gap-4 text-sm">
                     <div>
                       <p className="text-gray-500">Cliente</p>
                       <p className="font-medium">{order.customers?.full_name}</p>
@@ -131,10 +238,15 @@ export default function AdminPedidos() {
                     <div>
                       <p className="text-gray-500">Pagamento</p>
                       <p className="font-medium">{order.payment_method || "—"}</p>
+                      {ps && <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${ps.color}`}>{ps.label}</span>}
                     </div>
                     <div>
                       <p className="text-gray-500">Frete</p>
-                      <p className="font-medium">R$ {Number(order.shipping_cost || 0).toFixed(2).replace(".", ",")}</p>
+                      <p className="font-medium">{fmt(order.shipping_cost || 0)}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Total</p>
+                      <p className="font-bold text-primary text-lg">{fmt(order.total)}</p>
                     </div>
                   </div>
 
@@ -155,8 +267,8 @@ export default function AdminPedidos() {
                             <tr key={item.id}>
                               <td className="px-3 py-2">{item.product_name}</td>
                               <td className="px-3 py-2 text-center">{item.quantity}</td>
-                              <td className="px-3 py-2 text-right">R$ {Number(item.price).toFixed(2).replace(".", ",")}</td>
-                              <td className="px-3 py-2 text-right">R$ {(item.quantity * Number(item.price)).toFixed(2).replace(".", ",")}</td>
+                              <td className="px-3 py-2 text-right">{fmt(item.price)}</td>
+                              <td className="px-3 py-2 text-right">{fmt(item.quantity * Number(item.price))}</td>
                             </tr>
                           ))}
                         </tbody>

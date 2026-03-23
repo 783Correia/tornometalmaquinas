@@ -45,6 +45,8 @@ export function ProductForm({ product }: Props) {
     width: product?.width || 0,
     height: product?.height || 0,
     stock_quantity: product?.stock_quantity || 0,
+    manage_stock: product?.manage_stock ?? true,
+    featured: product?.featured ?? false,
     status: product?.status || "publish",
     category_id: product?.category_id || 0,
     brand_id: product?.brand_id || 0,
@@ -100,6 +102,8 @@ export function ProductForm({ product }: Props) {
       width: Number(form.width),
       height: Number(form.height),
       stock_quantity: Number(form.stock_quantity),
+      manage_stock: form.manage_stock,
+      featured: form.featured,
       category_id: form.category_id || null,
       brand_id: form.brand_id || null,
     };
@@ -169,12 +173,30 @@ export function ProductForm({ product }: Props) {
             </select>
           </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select value={form.status} onChange={(e) => update("status", e.target.value)} className={`${inputClass} max-w-xs`}>
-            <option value="publish">Publicado</option>
-            <option value="draft">Rascunho</option>
-          </select>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select value={form.status} onChange={(e) => update("status", e.target.value)} className={inputClass}>
+              <option value="publish">Publicado</option>
+              <option value="draft">Rascunho</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-3 pt-6">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={form.featured}
+                onChange={(e) => setForm((prev) => ({ ...prev, featured: e.target.checked }))}
+                className="w-4 h-4 text-primary rounded border-gray-300" />
+              <span className="text-sm font-medium text-gray-700">Produto Destaque</span>
+            </label>
+          </div>
+          <div className="flex items-center gap-3 pt-6">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={form.manage_stock}
+                onChange={(e) => setForm((prev) => ({ ...prev, manage_stock: e.target.checked }))}
+                className="w-4 h-4 text-primary rounded border-gray-300" />
+              <span className="text-sm font-medium text-gray-700">Controlar Estoque</span>
+            </label>
+          </div>
         </div>
       </div>
 
