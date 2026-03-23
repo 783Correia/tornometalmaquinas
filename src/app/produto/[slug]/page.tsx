@@ -13,17 +13,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const { data: product } = await supabase
     .from("products")
-    .select("name, short_description, brands(name), categories(name), product_images(src)")
+    .select("name, short_description, sku, brands(name), categories(name), product_images(src)")
     .eq("slug", slug)
     .single();
 
   if (!product) return { title: "Produto não encontrado" };
 
-  const title = product.name;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const brandName = (product.brands as any)?.name;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const categoryName = (product.categories as any)?.name;
+  const sku = product.sku || "";
+
+  // Title includes SKU so people searching by code find it
+  const title = sku
+    ? `${product.name} - ${sku}`
+    : product.name;
+
+  // Description rich in keywords: name, SKU, brand, category
   const description = product.short_description
-    || `${product.name}${brandName ? ` - ${brandName}` : ""}. Peça para plantadeira com envio para todo o Brasil. TornoMetal Everton Lopes.`;
+    || [
+      product.name,
+      sku ? `Código ${sku}` : "",
+      brandName ? `Marca ${brandName}` : "",
+      categoryName || "",
+      "Peça para plantadeira",
+      "Envio para todo o Brasil",
+      "TornoMetal Everton Lopes",
+    ].filter(Boolean).join(". ") + ".";
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const image = (product.product_images as any)?.[0]?.src;
   const url = `https://tornometalevertonlopes.com.br/produto/${slug}`;
@@ -73,16 +91,19 @@ export default async function ProductPage({ params }: Props) {
     .limit(4);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br";
+  const productUrl = `${siteUrl}/produto/${product.slug}`;
+  const allImages = (product.product_images || []).map((img: { src: string }) => img.src);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    description: product.short_description || product.name,
+    description: product.short_description || `${product.name}${product.sku ? ` - Código ${product.sku}` : ""}. Peça para plantadeira.`,
     sku: product.sku || undefined,
-    image: product.product_images?.[0]?.src || undefined,
+    mpn: product.sku || undefined,
+    image: allImages.length > 0 ? allImages : undefined,
     brand: product.brands ? { "@type": "Brand", name: product.brands.name } : undefined,
     category: product.categories?.name || undefined,
-    url: `${siteUrl}/produto/${product.slug}`,
+    url: productUrl,
     offers: {
       "@type": "Offer",
       price: product.sale_price || product.price,
@@ -90,9 +111,28 @@ export default async function ProductPage({ params }: Props) {
       availability: product.stock_quantity > 0
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
-      url: `${siteUrl}/produto/${product.slug}`,
-      seller: { "@type": "Organization", name: "TornoMetal Everton Lopes" },
+      url: productUrl,
+      seller: {
+        "@type": "Organization",
+        name: "TornoMetal Everton Lopes",
+        url: siteUrl,
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "BR",
+        },
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        applicableCountry: "BR",
+      },
     },
+    ...(product.weight > 0 ? { weight: { "@type": "QuantitativeValue", value: product.weight, unitCode: "KGM" } } : {}),
   };
 
   const breadcrumbJsonLd = {
