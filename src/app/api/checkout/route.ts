@@ -15,6 +15,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Dados incompletos" }, { status: 400 });
     }
 
+    // Check if customer profile exists
+    const { data: existingCustomer } = await supabase
+      .from("customers")
+      .select("id")
+      .eq("id", userId)
+      .single();
+
+    if (!existingCustomer) {
+      // Customer registered with old broken system - create profile from auth data
+      const { data: { user } } = await supabase.auth.admin.getUserById(userId);
+      if (user) {
+        await supabase.from("customers").insert({
+          id: userId,
+          full_name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente",
+          email: user.email || "",
+          phone: null,
+          cpf: null,
+        });
+      } else {
+        return NextResponse.json({ error: "Usuário não encontrado. Faça login novamente." }, { status: 401 });
+      }
+    }
+
     // Validate stock
     for (const item of items) {
       const { data: product } = await supabase
@@ -55,7 +78,7 @@ export async function POST(req: NextRequest) {
 
     if (orderErr || !order) {
       console.error("Order creation error:", orderErr);
-      return NextResponse.json({ error: "Erro ao criar pedido" }, { status: 500 });
+      return NextResponse.json({ error: `Erro ao criar pedido: ${orderErr?.message || "erro desconhecido"}` }, { status: 500 });
     }
 
     // Create order items
