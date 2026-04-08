@@ -70,6 +70,7 @@ export async function Footer() {
               <li><Link href="/termos" className="hover:text-primary transition">Termos de Uso</Link></li>
               <li><Link href="/privacidade" className="hover:text-primary transition">Política de Privacidade</Link></li>
               <li><Link href="/trocas" className="hover:text-primary transition">Trocas e Devoluções</Link></li>
+              <li><Link href="/frete" className="hover:text-primary transition">Política de Frete</Link></li>
               <li><Link href="/contato" className="hover:text-primary transition">Contato</Link></li>
               <li className="pt-2 text-gray-500">Tel: (54) 3315-3969</li>
             </ul>
