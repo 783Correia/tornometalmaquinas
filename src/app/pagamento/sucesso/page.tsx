@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle, Package, Home } from "lucide-react";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import { firePendingPurchase } from "@/lib/gtag";
 
 function Content() {
   const params = useSearchParams();
   const orderId = params.get("order");
+
+  useEffect(() => {
+    firePendingPurchase()
+  }, [])
 
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center px-4">

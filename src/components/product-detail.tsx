@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShoppingCart, Minus, Plus, ChevronLeft } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { ProductCard } from "@/components/product-card";
 import Link from "next/link";
 import type { Product } from "@/lib/supabase";
 import { ProductReviews } from "@/components/product-reviews";
+import { trackViewItem, trackAddToCart } from "@/lib/gtag";
 
 export function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
   const [selectedImage, setSelectedImage] = useState(0);
@@ -15,16 +16,28 @@ export function ProductDetail({ product, related }: { product: Product; related:
   const [added, setAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
+  useEffect(() => {
+    trackViewItem({
+      id: product.id,
+      name: product.name,
+      price: product.sale_price || product.price,
+      sku: product.sku,
+      category: product.categories?.name,
+      brand: product.brands?.name,
+    })
+  }, [product.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const images = (product.product_images || []).sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
   const currentImage = images[selectedImage];
 
   function handleAdd() {
+    const price = product.sale_price || product.price
     for (let i = 0; i < quantity; i++) {
       addItem({
         id: product.id,
         name: product.name,
         slug: product.slug,
-        price: product.sale_price || product.price,
+        price,
         image: images[0]?.src || "",
         sku: product.sku,
         weight: product.weight,
@@ -33,6 +46,15 @@ export function ProductDetail({ product, related }: { product: Product; related:
         height: product.height,
       });
     }
+    trackAddToCart({
+      id: product.id,
+      name: product.name,
+      price,
+      quantity,
+      sku: product.sku,
+      category: product.categories?.name,
+      brand: product.brands?.name,
+    })
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }

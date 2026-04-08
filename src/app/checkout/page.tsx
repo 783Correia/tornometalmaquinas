@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { useCartStore } from "@/lib/cart-store";
+import { trackBeginCheckout, storePurchaseData } from "@/lib/gtag";
 import { ShippingCalculator } from "@/components/shipping-calculator";
 import { MapPin, Truck, CreditCard, Loader2, CheckCircle } from "lucide-react";
 
@@ -181,6 +182,17 @@ export default function CheckoutPage() {
       const mpData = await mpRes.json();
 
       if (mpData.init_point) {
+        storePurchaseData({
+          transaction_id: String(orderId),
+          value: totalPrice() + shipping.price,
+          shipping: shipping.price,
+          items: items.map((item) => ({
+            item_id: item.sku || String(item.id),
+            item_name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+        })
         clearCart();
         window.location.href = mpData.init_point;
         return;
@@ -308,7 +320,12 @@ export default function CheckoutPage() {
                     className="px-6 py-3 rounded-xl border-2 border-gray-200 text-gray-600 hover:border-gray-300 transition">
                     Voltar
                   </button>
-                  <button onClick={() => setStep(3)} disabled={!shipping}
+                  <button
+                    onClick={() => {
+                      setStep(3)
+                      trackBeginCheckout(items, totalPrice() + (shipping?.price || 0))
+                    }}
+                    disabled={!shipping}
                     className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-primary-dark transition disabled:opacity-50">
                     Continuar
                   </button>
