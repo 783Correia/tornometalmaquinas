@@ -18,6 +18,7 @@ export default function TermosPage() {
 
           <h2>2. Sobre a Empresa</h2>
           <p>A TornoMetal Everton Lopes é uma fábrica de peças para plantadeiras e máquinas agrícolas, localizada em Passo Fundo/RS. Comercializamos peças para diversas marcas como Semeato, Jumil, John Deere, Massey Ferguson, Case e outras.</p>
+          <p><strong>Razão Social:</strong> TornoMetal Everton Lopes<br /><strong>CNPJ:</strong> 05.206.799/0001-90<br /><strong>Endereço:</strong> R. Goiás, 304, Vila Santa Maria — Passo Fundo, RS, 99070-250<br /><strong>Telefone:</strong> (54) 3315-3969</p>
 
           <h2>3. Produtos e Preços</h2>
           <p>Os preços exibidos no site são em Reais (R$) e podem ser alterados sem aviso prévio. Nos reservamos o direito de corrigir erros de preços ou informações a qualquer momento. A disponibilidade dos produtos está sujeita ao estoque.</p>

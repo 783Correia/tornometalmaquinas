@@ -76,9 +76,14 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-600">
+        <div className="border-t border-gray-800 mt-10 pt-8 flex flex-col md:flex-row justify-between items-start gap-4 text-sm text-gray-600">
           <p>&copy; {new Date().getFullYear()} TornoMetal Everton Lopes. Todos os direitos reservados.</p>
-          <p>Passo Fundo, RS - Brasil</p>
+          <div className="text-right text-xs leading-relaxed">
+            <p className="text-gray-500">TornoMetal Everton Lopes</p>
+            <p className="text-gray-500">CNPJ: 05.206.799/0001-90</p>
+            <p className="text-gray-500">R. Goiás, 304, Vila Santa Maria — Passo Fundo, RS, 99070-250</p>
+            <p className="text-gray-500">Tel: (54) 3315-3969</p>
+          </div>
         </div>
       </div>
     </footer>
