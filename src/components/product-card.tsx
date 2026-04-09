@@ -51,16 +51,6 @@ export function ProductCard({ product }: { product: Product }) {
             OFERTA
           </span>
         )}
-        {product.manage_stock && product.stock_quantity <= 0 && (
-          <span className="absolute top-2 right-2 bg-gray-800/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg">
-            ESGOTADO
-          </span>
-        )}
-        {product.manage_stock && product.stock_quantity > 0 && product.stock_quantity <= 5 && (
-          <span className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg">
-            ÚLTIMAS {product.stock_quantity}
-          </span>
-        )}
       </div>
       <div className="p-3 md:p-3.5">
         <div className="flex items-center gap-1 md:gap-1.5 mb-1 md:mb-1.5">
