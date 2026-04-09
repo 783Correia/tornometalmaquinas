@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-import { LayoutDashboard, Package, FolderOpen, Tags, Users, ShoppingBag, LogOut, Menu, X, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, Package, FolderOpen, Tags, Users, ShoppingBag, LogOut, Menu, X, AlertTriangle, Filter } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -14,6 +14,7 @@ const navItems = [
   { href: "/admin/marcas", label: "Marcas", icon: Tags },
   { href: "/admin/clientes", label: "Clientes", icon: Users },
   { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
+  { href: "/admin/leads", label: "Leads LP", icon: Filter },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

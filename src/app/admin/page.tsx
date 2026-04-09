@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import {
   Package, FolderOpen, Tags, Users, ShoppingBag,
-  DollarSign, Clock, AlertTriangle, TrendingUp, Eye,
+  DollarSign, Clock, AlertTriangle, TrendingUp, Eye, Filter,
 } from "lucide-react";
 
 type RecentOrder = {
@@ -36,6 +36,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({
     products: 0, categories: 0, brands: 0, customers: 0, orders: 0,
     revenue: 0, pendingOrders: 0, monthRevenue: 0, monthOrders: 0,
+    leadsNovos: 0, leadsTotal: 0,
   });
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [lowStock, setLowStock] = useState<LowStockProduct[]>([]);
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
       const now = new Date();
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-      const [p, c, b, cu, orders, pendingOrders, monthOrders, lowStockProducts, recent] = await Promise.all([
+      const [p, c, b, cu, orders, pendingOrders, monthOrders, lowStockProducts, recent, leadsNovos, leadsTotal] = await Promise.all([
         supabase.from("products").select("id", { count: "exact", head: true }),
         supabase.from("categories").select("id", { count: "exact", head: true }),
         supabase.from("brands").select("id", { count: "exact", head: true }),
@@ -55,6 +56,8 @@ export default function AdminDashboard() {
         supabase.from("orders").select("id, total, status").gte("created_at", monthStart),
         supabase.from("products").select("id, name, sku, stock_quantity").lte("stock_quantity", 5).order("stock_quantity", { ascending: true }).limit(10),
         supabase.from("orders").select("id, status, total, created_at, payment_status, customers(full_name)").order("created_at", { ascending: false }).limit(8),
+        supabase.from("leads").select("id", { count: "exact", head: true }).eq("status", "novo"),
+        supabase.from("leads").select("id", { count: "exact", head: true }),
       ]);
 
       const allOrders = orders.data || [];
@@ -75,6 +78,8 @@ export default function AdminDashboard() {
         pendingOrders: pendingOrders.count || 0,
         monthRevenue: mRevenue,
         monthOrders: mPaid.length,
+        leadsNovos: leadsNovos.count || 0,
+        leadsTotal: leadsTotal.count || 0,
       });
 
       setLowStock((lowStockProducts.data as LowStockProduct[]) || []);
@@ -122,13 +127,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         {[
           { label: "Produtos", value: stats.products, icon: Package, color: "bg-blue-500", href: "/admin/produtos" },
           { label: "Categorias", value: stats.categories, icon: FolderOpen, color: "bg-green-500", href: "/admin/categorias" },
           { label: "Marcas", value: stats.brands, icon: Tags, color: "bg-purple-500", href: "/admin/marcas" },
           { label: "Clientes", value: stats.customers, icon: Users, color: "bg-amber-500", href: "/admin/clientes" },
           { label: "Pedidos", value: stats.orders, icon: ShoppingBag, color: "bg-red-500", href: "/admin/pedidos" },
+          { label: `Leads LP (${stats.leadsNovos} novos)`, value: stats.leadsTotal, icon: Filter, color: "bg-indigo-500", href: "/admin/leads" },
         ].map((c) => (
           <Link key={c.label} href={c.href} className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm hover:border-primary/30 transition group">
             <div className={`w-9 h-9 ${c.color} rounded-lg flex items-center justify-center mb-2`}>
