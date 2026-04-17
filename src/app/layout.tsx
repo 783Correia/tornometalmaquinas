@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { WhatsAppButton } from "@/components/whatsapp-button";
+import { SiteLayout } from "@/components/site-layout";
 import { Analytics } from "@/components/analytics";
 
 const inter = Inter({
@@ -130,10 +128,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground overflow-x-hidden`}>
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
-        <WhatsAppButton />
+        <SiteLayout>
+          {children}
+        </SiteLayout>
         <Analytics />
       </body>
     </html>
