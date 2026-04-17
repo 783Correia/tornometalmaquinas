@@ -120,11 +120,11 @@ export function ProductDetail({ product, related }: { product: Product; related:
               <div className="mt-6 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
                 {product.sale_price ? (
                   <div>
-                    <span className="text-sm text-gray-400 line-through">R$ {product.regular_price.toFixed(2)}</span>
-                    <span className="text-3xl font-bold text-success ml-2">R$ {product.sale_price.toFixed(2)}</span>
+                    <span className="text-sm text-gray-400 line-through">R$ {Number(product.regular_price || product.price || 0).toFixed(2)}</span>
+                    <span className="text-3xl font-bold text-success ml-2">R$ {Number(product.sale_price).toFixed(2)}</span>
                   </div>
                 ) : (
-                  <span className="text-3xl font-bold text-gray-900">R$ {product.price.toFixed(2)}</span>
+                  <span className="text-3xl font-bold text-gray-900">R$ {Number(product.price || 0).toFixed(2)}</span>
                 )}
               </div>
 

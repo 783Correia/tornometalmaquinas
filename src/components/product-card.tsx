@@ -76,15 +76,15 @@ export function ProductCard({ product }: { product: Product }) {
             {product.sale_price ? (
               <div>
                 <span className="text-[11px] md:text-xs text-gray-400 line-through">
-                  R$ {product.regular_price.toFixed(2)}
+                  R$ {Number(product.regular_price || product.price || 0).toFixed(2)}
                 </span>
                 <span className="text-base md:text-lg font-bold text-success block -mt-0.5">
-                  R$ {product.sale_price.toFixed(2)}
+                  R$ {Number(product.sale_price).toFixed(2)}
                 </span>
               </div>
             ) : (
               <span className="text-base md:text-lg font-bold text-gray-900">
-                R$ {product.price.toFixed(2)}
+                R$ {Number(product.price || 0).toFixed(2)}
               </span>
             )}
           </div>
