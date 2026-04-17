@@ -69,8 +69,8 @@ export default function MinhaContaPage() {
     { id: "pedidos", label: "Pedidos", icon: <Package size={18} /> },
   ];
 
-  const statusLabels: Record<string, string> = { pending: "Pendente", paid: "Pago", shipped: "Enviado", delivered: "Entregue", cancelled: "Cancelado" };
-  const statusColors: Record<string, string> = { pending: "bg-yellow-50 text-yellow-700 border-yellow-200", paid: "bg-blue-50 text-blue-700 border-blue-200", shipped: "bg-purple-50 text-purple-700 border-purple-200", delivered: "bg-green-50 text-green-700 border-green-200", cancelled: "bg-red-50 text-red-700 border-red-200" };
+  const statusLabels: Record<string, string> = { pending: "Pendente", paid: "Pago", processing: "Processando", shipped: "Enviado", delivered: "Entregue", cancelled: "Cancelado" };
+  const statusColors: Record<string, string> = { pending: "bg-yellow-50 text-yellow-700 border-yellow-200", paid: "bg-blue-50 text-blue-700 border-blue-200", processing: "bg-blue-50 text-blue-700 border-blue-200", shipped: "bg-purple-50 text-purple-700 border-purple-200", delivered: "bg-green-50 text-green-700 border-green-200", cancelled: "bg-red-50 text-red-700 border-red-200" };
 
   const inputClass = "w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition";
 
@@ -204,7 +204,16 @@ export default function MinhaContaPage() {
                       <p className="text-sm text-gray-500 mb-2">{new Date(order.created_at).toLocaleDateString("pt-BR")}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-primary font-bold">R$ {order.total.toFixed(2)}</span>
-                        {order.tracking_code && <span className="text-xs text-gray-400">Rastreio: {order.tracking_code}</span>}
+                        {order.tracking_code && (
+                          <a
+                            href={`https://rastreamento.correios.com.br/app/index.php?objeto=${order.tracking_code}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline font-medium"
+                          >
+                            Rastrear pedido →
+                          </a>
+                        )}
                       </div>
                       {order.order_items && order.order_items.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-gray-200 space-y-1">
