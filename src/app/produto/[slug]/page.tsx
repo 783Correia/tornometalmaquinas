@@ -112,9 +112,7 @@ export default async function ProductPage({ params }: Props) {
       "@type": "Offer",
       price: product.sale_price || product.price,
       priceCurrency: "BRL",
-      availability: product.stock_quantity > 0
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
+      availability: "https://schema.org/InStock",
       url: productUrl,
       seller: {
         "@type": "Organization",
