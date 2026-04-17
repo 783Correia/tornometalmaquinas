@@ -12,18 +12,19 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
-  // Protect admin routes on the server side
+  // Protect admin routes: redirect to login if no auth cookie present
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const projectRef = new URL(supabaseUrl).hostname.split(".")[0];
 
-    // Check for auth cookie
-    const accessToken = req.cookies.get("sb-access-token")?.value
-      || req.cookies.get(`sb-${new URL(supabaseUrl).hostname.split(".")[0]}-auth-token`)?.value;
+    const accessToken =
+      req.cookies.get("sb-access-token")?.value ||
+      req.cookies.get(`sb-${projectRef}-auth-token`)?.value ||
+      req.cookies.get(`sb-${projectRef}-auth-token.0`)?.value ||
+      req.cookies.get(`sb-${projectRef}-auth-token.1`)?.value;
 
     if (!accessToken) {
-      // Let client-side handle auth check (admin layout already does this)
-      return NextResponse.next();
+      return NextResponse.redirect(new URL("/admin/login", req.url));
     }
   }
 

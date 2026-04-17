@@ -38,21 +38,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Validate stock
-    for (const item of items) {
-      const { data: product } = await supabase
-        .from("products")
-        .select("stock_quantity, manage_stock, name")
-        .eq("id", item.id)
-        .single();
-
-      if (product?.manage_stock && product.stock_quantity < item.quantity) {
-        return NextResponse.json(
-          { error: `Produto "${product.name}" tem apenas ${product.stock_quantity} unidade(s) em estoque.` },
-          { status: 409 }
-        );
-      }
-    }
+    // Stock is informational only — orders are always accepted
+    // The admin manages replenishment separately
 
     // Save address
     await supabase.from("customers").update({

@@ -14,8 +14,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 function verifyWebhookSignature(req: NextRequest): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET;
   if (!secret) {
-    // Allow webhooks without signature verification when secret is not configured
-    console.warn("MP_WEBHOOK_SECRET not configured - accepting webhook without signature verification");
+    console.error("SEGURANÇA: MP_WEBHOOK_SECRET não configurado — configure esta variável na Vercel para proteger pagamentos contra fraude.");
     return true;
   }
 

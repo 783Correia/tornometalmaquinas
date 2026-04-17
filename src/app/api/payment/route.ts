@@ -35,28 +35,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Pedido já processado" }, { status: 409 });
     }
 
-    // Server-side stock verification before creating payment
-    const { data: orderItems } = await supabase
-      .from("order_items")
-      .select("product_id, quantity")
-      .eq("order_id", orderId);
-
-    if (orderItems) {
-      for (const item of orderItems) {
-        const { data: product } = await supabase
-          .from("products")
-          .select("stock_quantity, manage_stock, name")
-          .eq("id", item.product_id)
-          .single();
-
-        if (product?.manage_stock && product.stock_quantity < item.quantity) {
-          return NextResponse.json(
-            { error: `Produto "${product.name}" sem estoque suficiente (disponível: ${product.stock_quantity})` },
-            { status: 409 }
-          );
-        }
-      }
-    }
     const preference = new Preference(client);
 
     const result = await preference.create({

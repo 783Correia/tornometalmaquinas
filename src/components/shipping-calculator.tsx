@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Truck, Loader2 } from "lucide-react";
+import Image from "next/image";
 
 type ShippingOption = {
   id: number;
@@ -111,7 +112,7 @@ export function ShippingCalculator({ products, onSelect }: Props) {
             >
               <div className="flex items-center gap-3 min-w-0">
                 {opt.logo && (
-                  <img src={opt.logo} alt={opt.company} className="w-8 h-8 object-contain shrink-0" />
+                  <Image src={opt.logo} alt={opt.company} width={32} height={32} className="object-contain shrink-0" unoptimized />
                 )}
                 <div className="text-left min-w-0">
                   <p className="font-medium text-gray-900 truncate">{opt.company} - {opt.name}</p>

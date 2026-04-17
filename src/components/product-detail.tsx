@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ShoppingCart, Minus, Plus, ChevronLeft } from "lucide-react";
+import DOMPurify from "dompurify";
 import { useCartStore } from "@/lib/cart-store";
 import { ProductCard } from "@/components/product-card";
 import Link from "next/link";
@@ -187,18 +188,7 @@ export function ProductDetail({ product, related }: { product: Product; related:
         {product.description && (
           <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Descrição do Produto</h2>
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: product.description
-              .replace(/<script[\s\S]*?<\/script>/gi, "")
-              .replace(/<iframe[\s\S]*?<\/iframe>/gi, "")
-              .replace(/<object[\s\S]*?<\/object>/gi, "")
-              .replace(/<embed[\s\S]*?>/gi, "")
-              .replace(/<link[\s\S]*?>/gi, "")
-              .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
-              .replace(/on\w+\s*=\s*[^\s>]*/gi, "")
-              .replace(/javascript\s*:/gi, "")
-              .replace(/data\s*:/gi, "data&#58;")
-              .replace(/vbscript\s*:/gi, "")
-            }} />
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description) }} />
           </div>
         )}
 
