@@ -3,7 +3,15 @@ import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product-detail";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const { data: products } = await supabase
+    .from("products")
+    .select("slug")
+    .eq("status", "publish");
+  return (products || []).map((p) => ({ slug: p.slug }));
+}
 
 type Props = {
   params: Promise<{ slug: string }>;
