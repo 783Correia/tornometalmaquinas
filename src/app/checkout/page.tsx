@@ -121,6 +121,7 @@ export default function CheckoutPage() {
             price: item.price,
           })),
           shipping: {
+            id: shipping.id,
             price: shipping.price,
             total: totalPrice() + shipping.price,
             company: shipping.company,

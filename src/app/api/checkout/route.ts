@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       shipping_cost: shipping.price,
       payment_method: null,
       payment_status: "pending",
-      notes: `Frete: ${shipping.company} - ${shipping.name} (${shipping.delivery_time} dias)`,
+      notes: `Frete: ${shipping.company} - ${shipping.name} (${shipping.delivery_time} dias) | serviceId:${shipping.id || 0}`,
     }).select("id").single();
 
     if (orderErr || !order) {

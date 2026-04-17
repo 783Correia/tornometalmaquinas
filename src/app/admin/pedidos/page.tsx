@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Search, ChevronDown, ChevronUp, Truck, Filter, CheckSquare, Square } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, Truck, Filter, CheckSquare, Square, Tag, ExternalLink } from "lucide-react";
 
 type Order = {
   id: number;
@@ -43,6 +43,8 @@ export default function AdminPedidos() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkStatus, setBulkStatus] = useState("");
+  const [generatingLabel, setGeneratingLabel] = useState<number | null>(null);
+  const [labelResult, setLabelResult] = useState<Record<number, { trackingCode?: string; labelUrl?: string; error?: string }>>({});
 
   useEffect(() => { load(); }, []);
 
@@ -57,6 +59,27 @@ export default function AdminPedidos() {
   async function updateStatus(id: number, status: string) {
     await supabase.from("orders").update({ status }).eq("id", id);
     load();
+  }
+
+  async function generateLabel(orderId: number) {
+    setGeneratingLabel(orderId);
+    try {
+      const res = await fetch("/api/melhorenvio/label", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setLabelResult((prev) => ({ ...prev, [orderId]: { error: data.error || "Erro ao gerar etiqueta" } }));
+      } else {
+        setLabelResult((prev) => ({ ...prev, [orderId]: { trackingCode: data.trackingCode, labelUrl: data.labelUrl } }));
+        load();
+      }
+    } catch {
+      setLabelResult((prev) => ({ ...prev, [orderId]: { error: "Erro de conexão" } }));
+    }
+    setGeneratingLabel(null);
   }
 
   async function updateTracking(id: number, code: string) {
@@ -292,7 +315,7 @@ export default function AdminPedidos() {
                       <Truck size={16} className="text-gray-400" />
                       <input
                         type="text"
-                        placeholder="Código de rastreio"
+                        placeholder="Código de rastreio manual"
                         defaultValue={order.tracking_code || ""}
                         onBlur={(e) => {
                           if (e.target.value !== (order.tracking_code || "")) {
@@ -307,6 +330,37 @@ export default function AdminPedidos() {
                         className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary transition w-52"
                       />
                     </div>
+
+                    {/* Gerar etiqueta automaticamente via Melhor Envio */}
+                    {order.payment_status === "approved" && !order.tracking_code && (
+                      <button
+                        onClick={() => generateLabel(order.id)}
+                        disabled={generatingLabel === order.id}
+                        className="flex items-center gap-2 bg-green-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-green-700 transition disabled:opacity-50"
+                      >
+                        <Tag size={15} />
+                        {generatingLabel === order.id ? "Gerando..." : "Gerar Etiqueta"}
+                      </button>
+                    )}
+
+                    {/* Resultado da geração */}
+                    {labelResult[order.id] && (
+                      <div className={`text-sm px-3 py-2 rounded-xl ${labelResult[order.id].error ? "bg-red-50 text-red-600" : "bg-green-50 text-green-700"}`}>
+                        {labelResult[order.id].error ? (
+                          labelResult[order.id].error
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            <span>Rastreio: <strong>{labelResult[order.id].trackingCode}</strong></span>
+                            {labelResult[order.id].labelUrl && (
+                              <a href={labelResult[order.id].labelUrl!} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-1 underline font-medium">
+                                <ExternalLink size={13} /> Imprimir etiqueta
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   {order.notes && (
                     <p className="text-xs text-gray-400 mt-2">{order.notes}</p>
