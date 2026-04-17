@@ -38,9 +38,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Stock is informational only — orders are always accepted
-    // The admin manages replenishment separately
-
     // Save address
     await supabase.from("customers").update({
       address_zip: address.address_zip,
@@ -52,11 +49,32 @@ export async function POST(req: NextRequest) {
       address_state: address.address_state,
     }).eq("id", userId);
 
+    // Fetch real prices from DB for each item
+    const verifiedItems = await Promise.all(
+      items.map(async (item: { id: number; name: string; quantity: number }) => {
+        const { data: product } = await supabase
+          .from("products")
+          .select("price, sale_price, name")
+          .eq("id", item.id)
+          .single();
+        const realPrice = product?.sale_price ?? product?.price ?? 0;
+        return {
+          id: item.id,
+          name: product?.name || item.name,
+          quantity: item.quantity,
+          price: Number(realPrice),
+        };
+      })
+    );
+
+    const itemsTotal = verifiedItems.reduce((acc, i) => acc + i.price * i.quantity, 0);
+    const orderTotal = itemsTotal + Number(shipping.price);
+
     // Create order
     const { data: order, error: orderErr } = await supabase.from("orders").insert({
       customer_id: userId,
       status: "pending",
-      total: shipping.total,
+      total: orderTotal,
       shipping_cost: shipping.price,
       payment_method: null,
       payment_status: "pending",
@@ -68,9 +86,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `Erro ao criar pedido: ${orderErr?.message || "erro desconhecido"}` }, { status: 500 });
     }
 
-    // Create order items
+    // Create order items with real prices from DB
     const { error: itemsErr } = await supabase.from("order_items").insert(
-      items.map((item: { id: number; name: string; quantity: number; price: number }) => ({
+      verifiedItems.map((item) => ({
         order_id: order.id,
         product_id: item.id,
         product_name: item.name,
