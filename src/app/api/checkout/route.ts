@@ -38,6 +38,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Bloquear abuso: máximo 3 pedidos pendentes por cliente
+    const { count: pendingCount } = await supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("customer_id", userId)
+      .eq("payment_status", "pending");
+
+    if ((pendingCount || 0) >= 3) {
+      return NextResponse.json(
+        { error: "Você já possui pedidos aguardando pagamento. Finalize-os antes de criar um novo." },
+        { status: 429 }
+      );
+    }
+
     // Save address
     await supabase.from("customers").update({
       address_zip: address.address_zip,

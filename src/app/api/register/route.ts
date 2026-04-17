@@ -20,6 +20,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "A senha deve ter pelo menos 6 caracteres." }, { status: 400 });
     }
 
+    // Bloquear CPF duplicado — evita múltiplas contas com mesmo CPF
+    const cleanCpf = cpf?.replace(/\D/g, "") || null;
+    if (cleanCpf && cleanCpf.length === 11) {
+      const { data: existingCpf } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("cpf", cleanCpf)
+        .single();
+      if (existingCpf) {
+        return NextResponse.json({ error: "Este CPF já está cadastrado. Faça login ou recupere sua senha." }, { status: 409 });
+      }
+    }
+
     // Create auth user with admin API (auto-confirms email)
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
