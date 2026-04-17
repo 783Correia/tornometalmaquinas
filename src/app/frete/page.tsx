@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Política de Frete | TornoMetal Everton Lopes",
   description: "Informações sobre prazos, custos e condições de entrega da TornoMetal Everton Lopes.",
+  robots: { index: false, follow: false },
 };
 
 export default function FretePage() {
