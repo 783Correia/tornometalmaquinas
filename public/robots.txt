@@ -4,7 +4,14 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /checkout
+Disallow: /carrinho
 Disallow: /minha-conta
 Disallow: /pagamento/
+Disallow: /pedido-confirmado
+Disallow: /login
+Disallow: /cadastro
+Disallow: /esqueci-senha
+Disallow: /redefinir-senha
+Disallow: /frete
 
 Sitemap: https://tornometalevertonlopes.com.br/sitemap.xml

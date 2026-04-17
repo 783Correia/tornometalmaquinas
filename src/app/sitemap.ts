@@ -10,22 +10,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const now = new Date();
 
-  // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${baseUrl}/loja`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
-    { url: `${baseUrl}/contato`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/contato`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${baseUrl}/termos`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/privacidade`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/trocas`, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  // Product pages
-  const { data: products } = await supabase
-    .from("products")
-    .select("slug, updated_at")
-    .eq("status", "publish")
-    .order("id");
+  const [{ data: products }, { data: categories }] = await Promise.all([
+    supabase.from("products").select("slug, updated_at").eq("status", "publish").order("id"),
+    supabase.from("categories").select("slug, updated_at").order("name"),
+  ]);
+
+  const categoryPages: MetadataRoute.Sitemap = (categories || []).map((c) => ({
+    url: `${baseUrl}/loja?categoria=${c.slug}`,
+    lastModified: c.updated_at ? new Date(c.updated_at) : now,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
 
   const productPages: MetadataRoute.Sitemap = (products || []).map((p) => ({
     url: `${baseUrl}/produto/${p.slug}`,
@@ -34,5 +38,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...productPages];
+  return [...staticPages, ...categoryPages, ...productPages];
 }
