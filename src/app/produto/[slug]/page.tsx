@@ -4,13 +4,18 @@ import { ProductDetail } from "@/components/product-detail";
 import type { Metadata } from "next";
 
 export const revalidate = 3600;
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const { data: products } = await supabase
-    .from("products")
-    .select("slug")
-    .eq("status", "publish");
-  return (products || []).map((p) => ({ slug: p.slug }));
+  try {
+    const { data: products } = await supabase
+      .from("products")
+      .select("slug")
+      .eq("status", "publish");
+    return (products || []).map((p) => ({ slug: p.slug }));
+  } catch {
+    return [];
+  }
 }
 
 type Props = {
@@ -18,6 +23,7 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  try {
   const { slug } = await params;
   const { data: product } = await supabase
     .from("products")
@@ -25,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("slug", slug)
     .single();
 
-  if (!product) return { title: "Produto não encontrado" };
+  if (!product) return { title: "Produto não encontrado", robots: { index: false } };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const brandName = (product.brands as any)?.name;
@@ -72,6 +78,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: image ? [image] : undefined,
     },
   };
+  } catch {
+    return { title: "TornoMetal - Peças para Plantadeiras" };
+  }
 }
 
 export default async function ProductPage({ params }: Props) {
