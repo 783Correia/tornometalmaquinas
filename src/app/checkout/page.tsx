@@ -199,9 +199,8 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Fallback
-      clearCart();
-      router.push(`/pedido-confirmado?id=${orderId}`);
+      // MP não retornou link — mostra erro, não redireciona sem pagamento
+      throw new Error(mpData.message || "Não foi possível iniciar o pagamento. Tente novamente.");
     } catch (err) {
       console.error("Checkout error:", err);
       setOrderError("Erro ao processar pedido. Tente novamente.");

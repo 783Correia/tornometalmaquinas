@@ -19,17 +19,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/trocas`, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  const [{ data: products }, { data: categories }] = await Promise.all([
-    supabase.from("products").select("slug, updated_at").eq("status", "publish").order("id"),
-    supabase.from("categories").select("slug, updated_at").order("name"),
-  ]);
-
-  const categoryPages: MetadataRoute.Sitemap = (categories || []).map((c) => ({
-    url: `${baseUrl}/loja?categoria=${c.slug}`,
-    lastModified: c.updated_at ? new Date(c.updated_at) : now,
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
+  const { data: products } = await supabase
+    .from("products")
+    .select("slug, updated_at")
+    .eq("status", "publish")
+    .order("id");
 
   const productPages: MetadataRoute.Sitemap = (products || []).map((p) => ({
     url: `${baseUrl}/produto/${p.slug}`,
@@ -38,5 +32,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...categoryPages, ...productPages];
+  return [...staticPages, ...productPages];
 }

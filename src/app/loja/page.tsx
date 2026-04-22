@@ -3,7 +3,7 @@ import { ProductCard } from "@/components/product-card";
 import { FilterSidebar } from "@/components/filter-sidebar";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // ISR: revalida a cada 30 minutos
 
 export const metadata: Metadata = {
   title: "Loja - Peças para Plantadeiras",

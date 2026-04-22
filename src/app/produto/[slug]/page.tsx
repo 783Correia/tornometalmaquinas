@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product-detail";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // ISR: revalida a cada 1 hora
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -104,6 +104,7 @@ export default async function ProductPage({ params }: Props) {
     description: product.short_description || `${product.name}${product.sku ? ` - Código ${product.sku}` : ""}. Peça para plantadeira.`,
     sku: product.sku || undefined,
     mpn: product.sku || undefined,
+    itemCondition: "https://schema.org/NewCondition",
     image: allImages.length > 0 ? allImages : undefined,
     brand: product.brands ? { "@type": "Brand", name: product.brands.name } : undefined,
     category: product.categories?.name || undefined,
@@ -113,6 +114,7 @@ export default async function ProductPage({ params }: Props) {
       price: product.sale_price || product.price,
       priceCurrency: "BRL",
       availability: "https://schema.org/InStock",
+      itemCondition: "https://schema.org/NewCondition",
       url: productUrl,
       seller: {
         "@type": "Organization",
