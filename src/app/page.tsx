@@ -5,10 +5,9 @@ import { HeroCarousel } from "@/components/hero-carousel";
 import { CategoryCarousel } from "@/components/category-carousel";
 import { Wrench, Truck, ShieldCheck, Headphones } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800; // ISR: revalida a cada 30 minutos
 
 async function getFeaturedProducts() {
-  // Get recent products that have images
   const { data } = await supabase
     .from("products")
     .select("*, categories(*), brands(*), product_images(*)")
@@ -16,7 +15,6 @@ async function getFeaturedProducts() {
     .order("created_at", { ascending: false })
     .limit(40);
 
-  // Filter only products with at least one image, sort images by position
   const withImages = (data || [])
     .filter((p) => p.product_images && p.product_images.length > 0)
     .map((p) => ({
@@ -32,29 +30,23 @@ async function getBrands() {
 }
 
 async function getCategoriesWithImages() {
+  // Uma query só: busca categorias + primeira imagem de produto via join
   const { data: categories } = await supabase
     .from("categories")
-    .select("*")
+    .select("*, products!inner(product_images(src))")
     .neq("slug", "sem-categoria")
+    .eq("products.status", "publish")
     .order("name");
 
   if (!categories) return [];
 
-  // Get one product image per category
-  const result = await Promise.all(
-    categories.map(async (cat) => {
-      const { data: products } = await supabase
-        .from("products")
-        .select("product_images(src)")
-        .eq("category_id", cat.id)
-        .eq("status", "publish")
-        .limit(1);
-      const image = products?.[0]?.product_images?.[0]?.src || null;
-      return { ...cat, image };
-    })
-  );
-
-  return result;
+  return categories.map((cat) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const image = (cat as any).products?.[0]?.product_images?.[0]?.src || null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { products: _, ...catData } = cat as any;
+    return { ...catData, image };
+  });
 }
 
 export default async function Home() {

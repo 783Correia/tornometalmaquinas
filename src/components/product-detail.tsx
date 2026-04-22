@@ -9,6 +9,7 @@ import { ProductCard } from "@/components/product-card";
 import Link from "next/link";
 import type { Product } from "@/lib/supabase";
 import { ProductReviews } from "@/components/product-reviews";
+import { ShippingCalculator } from "@/components/shipping-calculator";
 import { trackViewItem, trackAddToCart } from "@/lib/gtag";
 
 export function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
@@ -114,7 +115,11 @@ export function ProductDetail({ product, related }: { product: Product; related:
               {product.sku && <p className="text-sm text-gray-400 mt-2">SKU: {product.sku}</p>}
 
               <div className="mt-2">
-                <span className="text-xs font-medium text-green-600 bg-green-50 px-2.5 py-1 rounded-full">Em estoque</span>
+                {product.stock_quantity > 0 ? (
+                  <span className="text-xs font-medium text-green-600 bg-green-50 px-2.5 py-1 rounded-full">Em estoque ({product.stock_quantity} un)</span>
+                ) : (
+                  <span className="text-xs font-medium text-red-600 bg-red-50 px-2.5 py-1 rounded-full">Fora de estoque</span>
+                )}
               </div>
 
               <div className="mt-6 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
@@ -140,13 +145,31 @@ export function ProductDetail({ product, related }: { product: Product; related:
                 </div>
                 <button
                   onClick={handleAdd}
+                  disabled={product.stock_quantity <= 0}
                   className={`flex-1 flex items-center justify-center gap-2 font-semibold py-3.5 px-6 rounded-xl transition-all shadow-sm ${
-                    added ? "bg-success text-white" : "bg-primary text-white hover:bg-primary-dark hover:scale-[1.02]"
+                    product.stock_quantity <= 0
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                      : added ? "bg-success text-white" : "bg-primary text-white hover:bg-primary-dark hover:scale-[1.02]"
                   }`}
                 >
                   <ShoppingCart size={20} />
-                  {added ? "Adicionado!" : "Adicionar ao Carrinho"}
+                  {product.stock_quantity <= 0 ? "Indisponível" : added ? "Adicionado!" : "Adicionar ao Carrinho"}
                 </button>
+              </div>
+
+              {/* Calculadora de frete */}
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 mb-4">
+                <h3 className="font-semibold mb-3 text-sm text-gray-900">Calcular Frete</h3>
+                <ShippingCalculator
+                  products={[{
+                    weight: product.weight || 0.3,
+                    width: product.width || 11,
+                    height: product.height || 11,
+                    length: product.length || 16,
+                    quantity,
+                    price: product.sale_price || product.price,
+                  }]}
+                />
               </div>
 
               {(product.weight > 0 || product.length > 0) && (
