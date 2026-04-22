@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Search, ChevronDown, ChevronUp, Truck, Filter, CheckSquare, Square, Tag, ExternalLink } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, Truck, Filter, CheckSquare, Square, Tag, ExternalLink, RefreshCw } from "lucide-react";
 
 type Order = {
   id: number;
@@ -45,6 +45,8 @@ export default function AdminPedidos() {
   const [bulkStatus, setBulkStatus] = useState("");
   const [generatingLabel, setGeneratingLabel] = useState<number | null>(null);
   const [labelResult, setLabelResult] = useState<Record<number, { trackingCode?: string; labelUrl?: string; error?: string }>>({});
+  const [syncingPayment, setSyncingPayment] = useState<number | null>(null);
+  const [syncResult, setSyncResult] = useState<Record<number, { status?: string; message?: string; error?: string }>>({});
 
   useEffect(() => { load(); }, []);
 
@@ -59,6 +61,27 @@ export default function AdminPedidos() {
   async function updateStatus(id: number, status: string) {
     await supabase.from("orders").update({ status }).eq("id", id);
     load();
+  }
+
+  async function syncPayment(orderId: number) {
+    setSyncingPayment(orderId);
+    try {
+      const res = await fetch("/api/admin/sync-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSyncResult((prev) => ({ ...prev, [orderId]: { error: data.error || "Erro ao sincronizar" } }));
+      } else {
+        setSyncResult((prev) => ({ ...prev, [orderId]: { status: data.paymentStatus, message: data.message } }));
+        load();
+      }
+    } catch {
+      setSyncResult((prev) => ({ ...prev, [orderId]: { error: "Erro de conexão" } }));
+    }
+    setSyncingPayment(null);
   }
 
   async function generateLabel(orderId: number) {
@@ -330,6 +353,24 @@ export default function AdminPedidos() {
                         className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-primary transition w-52"
                       />
                     </div>
+
+                    {/* Re-verificar pagamento no MP (para pedidos pendentes) */}
+                    {order.payment_status !== "approved" && (
+                      <button
+                        onClick={() => syncPayment(order.id)}
+                        disabled={syncingPayment === order.id}
+                        className="flex items-center gap-2 bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-blue-700 transition disabled:opacity-50"
+                      >
+                        <RefreshCw size={15} className={syncingPayment === order.id ? "animate-spin" : ""} />
+                        {syncingPayment === order.id ? "Verificando..." : "Re-verificar Pagamento"}
+                      </button>
+                    )}
+
+                    {syncResult[order.id] && (
+                      <div className={`text-sm px-3 py-2 rounded-xl ${syncResult[order.id].error ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-700"}`}>
+                        {syncResult[order.id].error || syncResult[order.id].message || `Pagamento: ${syncResult[order.id].status}`}
+                      </div>
+                    )}
 
                     {/* Gerar etiqueta automaticamente via Melhor Envio */}
                     {order.payment_status === "approved" && !order.tracking_code && (
