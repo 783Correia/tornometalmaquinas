@@ -13,6 +13,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault();
+    e.stopPropagation();
     addItem({
       id: product.id,
       name: product.name,
