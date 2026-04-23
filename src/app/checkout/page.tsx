@@ -44,25 +44,33 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push("/login?redirect=/checkout"); return; }
-      setUserId(user.id);
-      const { data: profile } = await supabase.from("customers").select("*").eq("id", user.id).single();
-      if (profile) {
-        setAddress({
-          address_zip: profile.address_zip || "",
-          address_street: profile.address_street || "",
-          address_number: profile.address_number || "",
-          address_complement: profile.address_complement || "",
-          address_neighborhood: profile.address_neighborhood || "",
-          address_city: profile.address_city || "",
-          address_state: profile.address_state || "",
-        });
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.push("/login?redirect=/checkout");
+          return;
+        }
+        setUserId(user.id);
+        const { data: profile } = await supabase.from("customers").select("*").eq("id", user.id).single();
+        if (profile) {
+          setAddress({
+            address_zip: profile.address_zip || "",
+            address_street: profile.address_street || "",
+            address_number: profile.address_number || "",
+            address_complement: profile.address_complement || "",
+            address_neighborhood: profile.address_neighborhood || "",
+            address_city: profile.address_city || "",
+            address_state: profile.address_state || "",
+          });
+        }
+      } catch (err) {
+        console.error("Checkout init error:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     init();
-  }, [router]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function updateAddress(field: keyof Address, value: string) {
     setAddress((prev) => ({ ...prev, [field]: value }));
