@@ -16,11 +16,17 @@ export function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    let mounted = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (mounted) setUser(data.user);
     });
-    return () => subscription.unsubscribe();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted) setUser(session?.user ?? null);
+    });
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   function handleSearch(e: React.FormEvent) {

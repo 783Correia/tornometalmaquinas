@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -6,7 +6,17 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const referer = req.headers.get("referer") || "";
+  const origin = req.headers.get("origin") || "";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tornometalevertonlopes.com.br";
+
+  const isInternal = referer.startsWith(siteUrl) || origin.startsWith(siteUrl)
+    || referer.includes("localhost") || origin.includes("localhost");
+
+  if (!isInternal) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const { data: products } = await supabase
     .from("products")
     .select("id, name, slug, sku, price, sale_price, status, product_images(src)")

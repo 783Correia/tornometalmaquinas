@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MercadoPagoConfig, Payment } from "mercadopago";
+import { MercadoPagoConfig } from "mercadopago";
 import { createClient } from "@supabase/supabase-js";
 
 const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN! });
@@ -11,6 +11,15 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   const { orderId } = await req.json();
   if (!orderId) return NextResponse.json({ error: "orderId obrigatório" }, { status: 400 });
+
+  // Check current order status BEFORE any update
+  const { data: existingOrder } = await supabase
+    .from("orders")
+    .select("payment_status")
+    .eq("id", orderId)
+    .single();
+
+  const alreadyProcessed = existingOrder?.payment_status === "approved";
 
   // Busca pagamentos no MP pelo external_reference (orderId)
   const res = await fetch(
@@ -35,48 +44,38 @@ export async function POST(req: NextRequest) {
     status: orderStatus,
   }).eq("id", orderId);
 
-  // Se aprovado: decrementa estoque e envia email (igual ao webhook)
-  if (paymentStatus === "approved") {
-    const { data: existingOrder } = await supabase
+  // Se aprovado pela primeira vez: decrementa estoque e envia email
+  if (paymentStatus === "approved" && !alreadyProcessed) {
+    const { data: orderItems } = await supabase
+      .from("order_items")
+      .select("product_id, product_name, quantity, price")
+      .eq("order_id", orderId);
+
+    if (orderItems) {
+      for (const item of orderItems) {
+        await supabase.rpc("decrement_stock", {
+          p_product_id: item.product_id,
+          p_quantity: item.quantity,
+        });
+      }
+    }
+
+    const { data: order } = await supabase
       .from("orders")
-      .select("payment_status")
+      .select("*, customers(full_name, email), order_items(*)")
       .eq("id", orderId)
       .single();
 
-    const alreadyProcessed = existingOrder?.payment_status === "approved";
-
-    if (!alreadyProcessed) {
-      const { data: orderItems } = await supabase
-        .from("order_items")
-        .select("product_id, product_name, quantity, price")
-        .eq("order_id", orderId);
-
-      if (orderItems) {
-        for (const item of orderItems) {
-          await supabase.rpc("decrement_stock", {
-            p_product_id: item.product_id,
-            p_quantity: item.quantity,
-          });
-        }
-      }
-
-      const { data: order } = await supabase
-        .from("orders")
-        .select("*, customers(full_name, email)")
-        .eq("id", orderId)
-        .single();
-
-      if (order?.customers) {
-        const { sendPaymentApproved } = await import("@/lib/email/resend");
-        await sendPaymentApproved({
-          orderId,
-          customerName: order.customers.full_name,
-          customerEmail: order.customers.email,
-          items: order.order_items || [],
-          total: order.total,
-          shippingCost: order.shipping_cost,
-        }).catch((e) => console.error("Email error:", e));
-      }
+    if (order?.customers) {
+      const { sendPaymentApproved } = await import("@/lib/email/resend");
+      await sendPaymentApproved({
+        orderId,
+        customerName: order.customers.full_name,
+        customerEmail: order.customers.email,
+        items: orderItems || [],
+        total: order.total,
+        shippingCost: order.shipping_cost,
+      }).catch((e) => console.error("Email error:", e));
     }
   }
 

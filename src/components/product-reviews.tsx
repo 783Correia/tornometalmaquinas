@@ -47,6 +47,7 @@ export function ProductReviews({ productId }: { productId: number }) {
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
 
@@ -82,8 +83,9 @@ export function ProductReviews({ productId }: { productId: number }) {
     e.preventDefault();
     if (!userId || rating === 0) return;
     setSubmitting(true);
+    setSubmitError("");
 
-    await supabase.from("reviews").insert({
+    const { error } = await supabase.from("reviews").insert({
       product_id: productId,
       customer_id: userId,
       customer_name: userName,
@@ -92,6 +94,10 @@ export function ProductReviews({ productId }: { productId: number }) {
     });
 
     setSubmitting(false);
+    if (error) {
+      setSubmitError("Erro ao enviar avaliação. Tente novamente.");
+      return;
+    }
     setSubmitted(true);
     setShowForm(false);
     setRating(0);
@@ -145,6 +151,9 @@ export function ProductReviews({ productId }: { productId: number }) {
               placeholder="Conte sua experiência com o produto..."
             />
           </div>
+          {submitError && (
+            <p className="text-sm text-red-500">{submitError}</p>
+          )}
           <div className="flex gap-2">
             <button
               type="submit"
@@ -155,7 +164,7 @@ export function ProductReviews({ productId }: { productId: number }) {
             </button>
             <button
               type="button"
-              onClick={() => { setShowForm(false); setRating(0); setComment(""); }}
+              onClick={() => { setShowForm(false); setRating(0); setComment(""); setSubmitError(""); }}
               className="text-sm text-gray-500 px-4 py-2.5 hover:text-gray-700 transition"
             >
               Cancelar
