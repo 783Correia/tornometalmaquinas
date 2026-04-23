@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SiteLayout } from "@/components/site-layout";
 import { Analytics } from "@/components/analytics";
+import { Footer } from "@/components/footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -118,7 +119,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground overflow-x-hidden`}>
-        <SiteLayout>
+        <SiteLayout footer={<Footer />}>
           {children}
         </SiteLayout>
         <Analytics />
