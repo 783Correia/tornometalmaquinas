@@ -80,6 +80,7 @@ export async function POST(req: NextRequest) {
         "User-Agent": "TornoMetal (yuricorrea.ty@gmail.com)",
       },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10000),
     });
 
     const data = await res.json();

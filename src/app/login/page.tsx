@@ -15,7 +15,9 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/minha-conta";
+  const rawRedirect = searchParams.get("redirect") || "/minha-conta";
+  // Only allow internal redirects to prevent open redirect attacks
+  const redirect = rawRedirect.startsWith("/") && !rawRedirect.startsWith("//") ? rawRedirect : "/minha-conta";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
