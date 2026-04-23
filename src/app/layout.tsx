@@ -118,7 +118,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground overflow-x-hidden`}>
+      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground overflow-x-clip`}>
         <SiteLayout footer={<Footer />}>
           {children}
         </SiteLayout>
