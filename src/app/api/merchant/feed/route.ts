@@ -80,6 +80,8 @@ export async function GET() {
         <g:price>0 BRL</g:price>
       </g:shipping>
       <g:return_policy_label>default-return-policy</g:return_policy_label>
+      <g:excluded_destination>local_inventory_ads</g:excluded_destination>
+      <g:excluded_destination>free_local_listings</g:excluded_destination>
     </item>`;
     })
     .filter(Boolean);
